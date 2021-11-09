@@ -1,0 +1,149 @@
+body {
+    border: 0;
+    padding: 0;
+    font-family: "Avenir", "Arial", "Helvetica", "sans-serif";
+    background-color: black;
+    width: 100%;
+    height: 100%;
+}
+
+
+#screen {
+    border: 0;
+    padding: 0;
+
+}
+
+button {
+    display: block;
+    background-color: #132CAD;
+    color: white;
+    border: 0;
+    padding: 10px 20px;
+    font-size: 1em;
+    text-align: center;
+}
+
+.bu {
+    font-size: 2rem;
+    color: #fff !important;
+    text-transform: uppercase;
+    text-decoration: none;
+    background: #ff000000;
+    padding: 1rem;
+    margin: 0.1rem;
+    border-radius: 9px;
+    border-color: rgba(255, 255, 255, 1);
+    display: inline-block;
+    border: 4px solid;
+    transition: all 0.4s ease 0s;
+    animation-name: blinking;
+    animation-duration: 10s;
+    animation-iteration-count: 100;
+}
+
+@keyframes blinking {
+    50% {
+        border-color: rgba(255, 255, 255, 0);
+    }
+}
+
+
+
+
+.bu:hover {
+    background: #FF69B4;
+    -webkit-box-shadow: 0px 5px 40px -10px rgba(0, 0, 0, 0.57);
+    -moz-box-shadow: 0px 5px 40px -10px rgba(0, 0, 0, 0.57);
+    box-shadow: 5px 40px -10px rgba(0, 0, 0, 0.57);
+    transition: all 0.4s ease 0s;
+}
+
+canvas {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    /*    border: 5px solid black;
+    padding: 10px;
+    margin-left: 50px;*/
+}
+
+
+
+#buttonsW {
+    position: relative;
+    top: 10%;
+    transform: translateY(-50%);
+}
+
+
+#buttons {
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    display: block;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    text-align: center;
+}
+
+#gyro {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    color: white;
+    max-width: 300px;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 0.3rem;
+    margin: 0.3rem;
+    ;
+}
+
+#request-device {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: none;
+}
+
+#get-device {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: none;
+}
+
+#ir {
+    position: absolute;
+    color: white;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 0.3rem;
+    margin: 0.3rem;
+    left: 0;
+    top: 0;
+}
+
+#loading {
+    position: absolute;
+    color: white;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 0.3rem;
+    margin: 0.3rem;
+    align-content: center;
+    top: 0;
+    width: 100%;
+    text-align: center;    
+}
+
+#loading-msg {
+    
+}
+
+
+
+
+

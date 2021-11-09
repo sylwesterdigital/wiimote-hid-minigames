@@ -1,3 +1,20 @@
+dist/
+delivery/
+archive/
+psds/
+design/
+*.zip
+*.tar.gz
+*.sh
+*.psd
+*.pdf
+*.doc
+*.docx
+*.ai
+*.ttf
+.DS_Store
+
+
 # Logs
 logs
 *.log

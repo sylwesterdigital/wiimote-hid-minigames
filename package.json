@@ -1,0 +1,32 @@
+{
+  "name": "interactivewall",
+  "version": "1.0.0",
+  "description": "interactive wall",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server --mode development --open --host 0.0.0.0",
+    "build": "webpack"
+  },
+  "keywords": [],
+  "author": "Sylwester K. Mielniczuk - s.mielniczuk@samsung.com",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-loader": "^8.2.2",
+    "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^9.0.1",
+    "css-loader": "^6.4.0",
+    "html-webpack-plugin": "^5.3.2",
+    "pixi.js": "^6.1.3",
+    "source-map-loader": "^3.0.0",
+    "style-loader": "^3.3.0",
+    "webpack": "^5.58.2",
+    "webpack-cli": "^4.9.0",
+    "webpack-dev-server": "^4.3.1",
+    "webpack-zepto": "^0.0.1"
+  },
+  "dependencies": {
+    "@pixi/basis": "^6.1.3",
+    "@pixi/core": "^6.1.3",
+    "@pixi/loaders": "^6.1.3"
+  }
+}
