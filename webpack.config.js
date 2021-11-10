@@ -14,7 +14,7 @@ module.exports = {
     hot: true,
     https: true,
     host: 'localhost',
-    port: 3030
+    port: 5555  
   },
   module: {
     rules: [

@@ -53,6 +53,7 @@ export default class WIIMote{
         this.BtnListener = null
 
         this.id = "MyID"
+        this.points = 0;
 
        
         setTimeout( this.initiateDevice(), 200);

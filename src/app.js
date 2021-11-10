@@ -4,6 +4,13 @@ var contentData = "./assets/Content.json";
 //import * as PIXI from 'pixi.js'
 import { Application, Container, Graphics, Loader, Sprite, Texture, Text } from 'pixi.js'
 
+/* Greensock */
+import { gsap} from "gsap";
+gsap.registerPlugin(PixiPlugin);
+PixiPlugin.registerPIXI(Application);
+import { PixiPlugin } from "gsap/PixiPlugin";
+
+
 //import { BasisLoader } from '@pixi/basis';
 //import { Loader } from '@pixi/loaders';
 
@@ -66,7 +73,7 @@ let sBrush1, sBrush2, sBrush3, sBrush4;
 let sBrushes = []
 
 
-let scale1 = 0.24
+let scale1 = 0.14
 
 let selected;
 let selectedGraphic = 0;
@@ -149,6 +156,7 @@ function enableControls() {
 
 
     wiimotes[wiiN].id = wiiN;
+    wiimotes[wiiN].points = 0;
 
     wiimotes[wiiN].BtnListener = (buttons,myID) => {
 
@@ -370,7 +378,12 @@ function initController() {
             const wiimote = new WIIMote(device)
 
             wiimotes.push(wiimote);
+
             conBut.innerText = "+ "+(wiimotes.length+1);
+
+            addHUD(wiimotes.length-1)
+            addBrushes(wiimotes.length-1)
+
 
             if(wiimotes.length >= 4) {
              document.getElementById("request-hid-device").style.display = "none";  
@@ -541,6 +554,133 @@ function clearAllCanvas() {
 //     console.log(a)
 // }
 
+
+function startGame(argument) {
+    // body...
+}
+
+
+
+let particles = []
+w.particles = particles;
+let particlesK = 0
+
+function addEmmiter(n) {
+
+    console.log("addEmmiter")
+
+
+    // add particles on the left an
+    // d move them to the right them back them to the left
+
+    for(var i=0; i < n; i++) {
+
+        let texture = textures[Math.floor(Math.random() * textures.length)]
+
+        const p = new Sprite(texture);
+
+
+
+        let s1 = Math.random()*0.1+ 0.01;
+
+        p.scale.set(s1,s1);
+
+        p.name = "p_"+parseInt(i+particlesK);
+
+        p.angle = Math.random()*5;
+        p.angleSet = Math.random()*2 - Math.random()*2;
+
+        p.anchor.set(0.5)
+
+
+        p.x = -p.width - Math.random()*300
+        p.y = Math.floor(Math.random() * (app.screen.height - 150)) + 50;
+
+        p.speedX = Math.random()*2 + 0.2;
+        p.speedY = Math.random()*0.5 - Math.random()*0.5;
+
+        //p.zIndex = 1;
+
+        particles.push(p)
+
+
+        mC.addChild(p);
+
+    }
+
+    particlesK += n;    
+
+
+    document.getElementById("game-msg").innerHTML = "addEmmiter: "+n
+
+}
+w.addEmmiter = addEmmiter
+
+
+function addBrushes(id) {
+
+    let n = id+1;
+    let r = Sprite.from("./assets/brushes/vBrush-"+n+".png"); //Sprite.from(textures[5])
+    r.zIndex = 10000004;
+    r.name = "vBrush"+id;
+    vBrushes.push(r)
+
+    mC.addChild(r)
+
+
+    let sr = Sprite.from(textures[0])
+
+    sr.zIndex = 5000+id;
+    sr.scale.set(scale1 * 0.9)
+    sr.anchor.set(0.5)
+    sr.minScale = 0.1;
+    sr.maxScale = 2;
+
+    sBrushes.push(sr)
+
+    mC.addChild(sr)
+
+
+}
+
+function bounce(r) {
+
+    let tl3 = gsap.timeline({delay: 0,repeat: 0,repeatDelay: 0});   
+
+    tl3
+        .to(r.scale, 0.05, { ease: "power1", x: scale1*1.5, y: scale1*1.5, yoyo:true, repeat:3, repeatDelay: 0, 
+            onComplete: function () {
+                r.scale.set(scale1,scale1);
+            }},"+=0")
+        .from(r, 0.3, { ease: "power1", opacity: 0},"<")
+
+}
+
+
+function addHUD(id) {
+
+        console.log("addHUD",id)
+
+        let colors = ["yellow","red","green","blue"]
+        let color = colors[id];
+
+        // EXTRA LIFES
+        //---------------- 
+        let n = parseInt(id)+1;
+        let r = new Text("Player "+n+": 0 PTS", {fontSize: 24, fontFamily: "Avenir, Roboto, sans-serif", align: "right", fill:color});
+        r.position.x = 16;
+        r.position.y = 50+id*36;
+        r.name = "R"+id
+
+        mC.addChild(r);    
+    // body...
+}
+
+w.addHUD = addHUD;
+
+
+
+
 function initPixi() {
 
     console.log("initPixi");
@@ -570,15 +710,15 @@ function initPixi() {
 
     app.stage.addChild(mC);
 
-    mC.addChild(vBrush1)
-    mC.addChild(vBrush2)
-    mC.addChild(vBrush3)
-    mC.addChild(vBrush4)
+    // mC.addChild(vBrush1)
+    // mC.addChild(vBrush2)
+    // mC.addChild(vBrush3)
+    // mC.addChild(vBrush4)
 
-    mC.addChild(sBrush1)
-    mC.addChild(sBrush2)
-    mC.addChild(sBrush3)
-    mC.addChild(sBrush4)
+    // mC.addChild(sBrush1)
+    // mC.addChild(sBrush2)
+    // mC.addChild(sBrush3)
+    // mC.addChild(sBrush4)
 
 
     function dropPaint(id) {
@@ -756,29 +896,30 @@ function initPixi() {
 
 
 
-    function _selected(textureId, x, y) {
+    // function _selected(textureId, x, y) {
 
-        console.log("_selected: textureId, x, y", textureId, x, y)
+    //     console.log("_selected: textureId, x, y", textureId, x, y)
 
-        if (selected != null) {
-            mC.removeChild(selected)
-        }
+    //     if (selected != null) {
+    //         mC.removeChild(selected)
+    //     }
 
-        selected = new Graphics();
-        selected.beginFill(0xFFC0CB, 0.4);
-        selected.drawRect(x - 35, wapp.H - 80, 80, 80);
-        selected.endFill();
-        selected.zIndex = 10
-        selectedGraphic = textureId
+    //     selected = new Graphics();
+    //     selected.beginFill(0xFFC0CB, 0.4);
+    //     selected.drawRect(x - 35, wapp.H - 80, 80, 80);
+    //     selected.endFill();
+    //     selected.zIndex = 10
+    //     selectedGraphic = textureId
 
-        mC.addChild(selected)
-    }
+    //     mC.addChild(selected)
+    // }
 
 
     function changeTool(tool) {
         console.log("changeTool(tool)", tool)
         selectedTool = tool
     }
+
     w.changeTool = changeTool;
 
 
@@ -981,7 +1122,80 @@ function initPixi() {
                 //console.log(wapp.W, item.x)
             });
         }
+
+
+        if (particles.length > 0) {
+
+            particles.forEach(p => {
+
+                if (p.x > wapp.W + p.width) {
+                    p.x = -p.width - Math.random()*300
+                    p.y = Math.floor(Math.random() * (app.screen.height - 150)) + 50;
+                    p.speedX = Math.random()*4 + 0.3;
+                    p.speedY = Math.random()*1 - Math.random()*1;
+                }
+
+                if (p.y > wapp.H + p.height) {
+                    p.y = -p.height;
+                }
+
+                if (p.y < -wapp.H - p.height) {
+                    p.y = wapp.H + p.height;
+                }
+
+                p.x += p.speedX;
+                p.y += p.speedY;
+
+                p.angle += p.angleSet;
+
+                //console.log(wapp.W, item.x)
+                /* check collision */
+                for(let g in sBrushes) {
+
+                    let b = sBrushes[g];
+                    let c = p.position;
+                    let r = b.position;
+
+                    //console.log(Math.abs(r.y-c.y))
+                  //if(Math.abs(r.y-c.y)<=(p.height*.7 ) && Math.abs(r.x-c.x)<=r.width*.7) {
+
+                  if(Math.abs(r.y-c.y)<=b.height*b.scale.x+p.height*p.scale.x && Math.abs(r.x-c.x) <= b.width*b.scale.x+p.width*p.scale.x) {  
+
+                    //console.log('collision with ',p.name);
+
+                    //mC.removeChild(p);
+
+                    gsap.to(p, {duration: 0.25, width: 0, height:100, onComplete:function() {
+                        //console.log("next");
+                        mC.removeChild(p);
+                        //pointsContainer.removeChild(r);
+                    }});
+
+                    particles.splice(particles.findIndex( item => item.name === p.name ),1)
+
+                    let points = Math.floor(Math.abs(p.speedX*p.speedY*10));
+                    addPoints(g,points)
+                    document.getElementById("game-msg").innerHTML = "particles: "+particles.length;
+
+                    //speedY = - (speedY+2);
+                    //addPointsCloud(10, stick.position.x,  stick.position.y)
+                    //playBoing(1);
+                    // change tint... 
+                    //stick.tint = tints[Math.floor(Math.random()*tints.length)];
+
+                    }
+                }
+            });
+
+
+        } else {
+            addEmmiter(Math.ceil(Math.random()*50));
+        }
+
+
+
     })
+
 
 
     initController();
@@ -1014,7 +1228,7 @@ function addSprites(resources) {
 
     Object.keys(resources).forEach(key => {
         //console.log(resources[key]);
-        console.log('addSprites:', key)
+        //console.log('addSprites:', key)
         textures.push(resources[key].texture)
 
     });
@@ -1051,7 +1265,7 @@ function loadAssets() {
     //loader.use(parsingMiddleware)
 
     loader.onProgress.add((res) => {
-        console.log("loading...", res.progress)
+        //console.log("loading...", res.progress)
         loadingElMsg.innerHTML = ""+Math.round(res.progress)+"%";
     }); // called once per loaded/errored file
 
@@ -1132,12 +1346,23 @@ function loadAssets() {
 }
 */
 
+function addPoints(id,p) {
+
+    let n = parseInt(id)+1;
+    wiimotes[id].points +=p;
+    app.stage.getChildByName("mC").getChildByName("R"+id).text = "Player "+n+": "+wiimotes[id].points+" PTS";
+
+    bounce(sBrushes[id])
+
+}
+
 
 function setupStage() {
 
     console.log("setupStage");
 
     mC = new Container();
+    mC.name = "mC";
     mC.interactive = true
     mC.buttonMode = true
     mC.sortableChildren = true
@@ -1149,80 +1374,6 @@ function setupStage() {
     paintingArea.endFill();
     paintingArea.zIndex = 1
     paintingArea.interactive = true
-
-
-    /* Virtual Brushes 
-
-        got numbers - 1, 2, 3, 4 ...
-
-    */
-
-
-    vBrush1 = Sprite.from("./assets/brushes/vBrush-1.png"); //Sprite.from(textures[5])
-    vBrush1.zIndex = 10000001;
-    vBrush1.name = "vBrush1"
-
-    vBrush2 = Sprite.from("./assets/brushes/vBrush-2.png"); //Sprite.from(textures[5])
-    vBrush2.zIndex = 10000002;
-    vBrush2.name = "vBrush2"
-
-    vBrush3 = Sprite.from("./assets/brushes/vBrush-3.png"); //Sprite.from(textures[5])
-    vBrush3.zIndex = 10000003;
-    vBrush3.name = "vBrush3"
-
-    vBrush4 = Sprite.from("./assets/brushes/vBrush-4.png"); //Sprite.from(textures[5])
-    vBrush4.zIndex = 10000004;
-    vBrush4.name = "vBrush4"
-
-
-    vBrushes.push(vBrush1,vBrush2,vBrush3,vBrush4)
-
-
-    window.vBrush1 = vBrush1;
-    window.vBrush2 = vBrush2;
-    window.vBrushes = vBrushes;
-
-
-    /* Brushes */
-
-    sBrush1 = Sprite.from(textures[0])
-
-    sBrush1.zIndex = 50000;
-    sBrush1.scale.set(scale1 * 0.9)
-    sBrush1.anchor.set(0.5)
-    sBrush1.minScale = 0.1;
-    sBrush1.maxScale = 2;
-
-    sBrush2 = Sprite.from(textures[0])
-
-    sBrush2.zIndex = 50001;
-    sBrush2.scale.set(scale1 * 0.9)
-    sBrush2.anchor.set(0.5)
-    sBrush2.minScale = 0.1;
-    sBrush2.maxScale = 2;
-
-    sBrush3 = Sprite.from(textures[0])
-
-    sBrush3.zIndex = 50002;
-    sBrush3.scale.set(scale1 * 0.9)
-    sBrush3.anchor.set(0.5)
-    sBrush3.minScale = 0.1;
-    sBrush3.maxScale = 2;
-
-
-    sBrush4 = Sprite.from(textures[0])
-
-    sBrush4.zIndex = 50003;
-    sBrush4.scale.set(scale1 * 0.9)
-    sBrush4.anchor.set(0.5)
-    sBrush4.minScale = 0.1;
-    sBrush4.maxScale = 2;
-
-
-    sBrushes.push(sBrush1,sBrush2, sBrush3, sBrush4)
-
-
-    window.sBrushes = sBrushes;
 
 
 

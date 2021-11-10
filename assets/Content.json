@@ -1,0 +1,102 @@
+{
+
+    "shapes": [
+      
+        {
+            "n": "planet-a",
+            "p": "./assets/shapes/png-tiny/01.png"  
+        },
+        {
+            "n": "planet-b",
+            "p": "./assets/shapes/png-tiny/02.png"  
+        },
+        {
+            "n": "planet-c",
+            "p": "./assets/shapes/png-tiny/03.png"  
+        },
+        {
+            "n": "planet-d",
+            "p": "./assets/shapes/png-tiny/04.png"  
+        },
+        {
+            "n": "planet-e",
+            "p": "./assets/shapes/png-tiny/04.png"  
+        },
+        {
+            "n": "planet-f",
+            "p": "./assets/shapes/png-tiny/17.png"  
+        },
+
+
+        {
+            "n": "seed-1",
+            "p": "./assets/shapes/png-tiny/06.png"  
+        },
+        {
+            "n": "seed-2",
+            "p": "./assets/shapes/png-tiny/07.png"  
+        },
+
+
+
+        {
+            "n": "star-1",
+            "p": "./assets/shapes/png-tiny/08.png"  
+        },
+        {
+            "n": "star-2",
+            "p": "./assets/shapes/png-tiny/09.png"  
+        },
+        {
+            "n": "star-3",
+            "p": "./assets/shapes/png-tiny/10.png"  
+        },
+        {
+            "n": "star-4",
+            "p": "./assets/shapes/png-tiny/11.png"  
+        },
+        {
+            "n": "star-5",
+            "p": "./assets/shapes/png-tiny/12.png"  
+        },
+        {
+            "n": "star-6",
+            "p": "./assets/shapes/png-tiny/13.png"  
+        },
+        {
+            "n": "star-7",
+            "p": "./assets/shapes/png-tiny/14.png"  
+        },
+
+        {
+            "n": "flower-1",
+            "p": "./assets/shapes/png-tiny/15.png"  
+        },
+        {
+            "n": "flower-2",
+            "p": "./assets/shapes/png-tiny/16.png"  
+        }
+
+    ],
+
+
+    "intro":
+    {
+        "title": "Myrtis Quiz",
+        "desc": "\n\nThere will be 13 questions to answer to check what you have learnt about Myrtis. If you are ready please click the START\n\n\n\n"
+    },
+
+    "outro":
+    {
+        "title": "Results",
+        "desc": "\n\nThis is a message which will contain the results of quiz.\n\n\n\n"
+    },
+
+    "buttons":
+    {
+        "start":
+        {
+            "label": "START"
+        }
+    }
+}
