@@ -1,18 +1,22 @@
 import css from './style.css';
 var contentData = "./assets/Content.json";
 
-//import * as PIXI from 'pixi.js'
-import { Application, Container, Graphics, Loader, Sprite, Texture, Text } from 'pixi.js'
+import * as PIXI from 'pixi.js'
+//import { Application, Container, Graphics, Loader, Sprite, Texture, Text } from 'pixi.js'
 
 /* Greensock */
 import { gsap} from "gsap";
 gsap.registerPlugin(PixiPlugin);
-PixiPlugin.registerPIXI(Application);
+PixiPlugin.registerPIXI(PIXI);
+
 import { PixiPlugin } from "gsap/PixiPlugin";
+
+/* Pixi Sound */
+import { sound } from '@pixi/sound';
 
 
 //import { BasisLoader } from '@pixi/basis';
-//import { Loader } from '@pixi/loaders';
+import { Loader } from '@pixi/loaders';
 
 //Loader.registerPlugin(BasisLoader);
 // Use this if you to use the default
@@ -105,6 +109,30 @@ var app = null;
 let ledK = 0;
 
 let textures = []
+
+
+const soundsData = {
+    fail1: './assets/audio/fx/ohh1.mp3',
+    fail2: './assets/audio/fx/ohh2.mp3',
+    fail3: './assets/audio/fx/ohh3.mp3',
+    fail4: './assets/audio/fx/ohh4.mp3',
+    joined: './assets/audio/fx/Pickup_Coin2.wav',
+    boing: './assets/audio/fx/blip1.mp3'
+};
+
+// Add to the PIXI loader
+for (let name in soundsData) {
+    PIXI.Loader.shared.add(name, soundsData[name]);
+}
+
+
+w.sound = sound
+
+
+
+
+// sound.play('my-sound');
+
 
 function circleLed() {
     setInterval(function() {
@@ -382,7 +410,12 @@ function initController() {
             conBut.innerText = "+ "+(wiimotes.length+1);
 
             addHUD(wiimotes.length-1)
+
             addBrushes(wiimotes.length-1)
+
+
+            //playBoing(1);
+            //sound.play('boing')
 
 
             if(wiimotes.length >= 4) {
@@ -567,7 +600,7 @@ let particlesK = 0
 
 function addEmmiter(n) {
 
-    console.log("addEmmiter")
+    console.log("addEmmiter",n)
 
 
     // add particles on the left an
@@ -575,9 +608,9 @@ function addEmmiter(n) {
 
     for(var i=0; i < n; i++) {
 
-        let texture = textures[Math.floor(Math.random() * textures.length)]
+        let tx = textures[Math.floor(Math.random() * textures.length)]
 
-        const p = new Sprite(texture);
+        const p = new PIXI.Sprite(tx);
 
 
 
@@ -619,16 +652,20 @@ w.addEmmiter = addEmmiter
 
 function addBrushes(id) {
 
+    console.log("addBrushes",id)
+
     let n = id+1;
-    let r = Sprite.from("./assets/brushes/vBrush-"+n+".png"); //Sprite.from(textures[5])
-    r.zIndex = 10000004;
+
+    // brush with a number
+    const r = new PIXI.Sprite.from("./assets/brushes/vBrush-"+n+".png"); //Sprite.from(textures[5])
+    r.zIndex = 1000000+id;
     r.name = "vBrush"+id;
+
     vBrushes.push(r)
 
-    mC.addChild(r)
 
-
-    let sr = Sprite.from(textures[0])
+    //let texture = textures[0]
+    let sr = new PIXI.Sprite(textures[0]);
 
     sr.zIndex = 5000+id;
     sr.scale.set(scale1 * 0.9)
@@ -639,6 +676,7 @@ function addBrushes(id) {
     sBrushes.push(sr)
 
     mC.addChild(sr)
+    mC.addChild(r)
 
 
 }
@@ -667,12 +705,17 @@ function addHUD(id) {
         // EXTRA LIFES
         //---------------- 
         let n = parseInt(id)+1;
-        let r = new Text("Player "+n+": 0 PTS", {fontSize: 24, fontFamily: "Avenir, Roboto, sans-serif", align: "right", fill:color});
+        let r = new PIXI.Text("Player "+n+": 0 PTS", {fontSize: 24, fontFamily: "Avenir, Roboto, sans-serif", align: "right", fill:color});
         r.position.x = 16;
         r.position.y = 50+id*36;
         r.name = "R"+id
 
         mC.addChild(r);    
+
+
+        sound.play('joined');
+
+
     // body...
 }
 
@@ -687,7 +730,7 @@ function initPixi() {
 
     let view = document.getElementById("screen")
 
-    app = new Application({
+    app = new PIXI.Application({
         /*        width: wapp.W, 
                 height: wapp.H, */
         backgroundColor: cols_blue1,
@@ -748,20 +791,21 @@ function initPixi() {
 
         var texture, svg;
 
-        if (textureId == "random") {
+        // if (textureId == "random") {
 
-            texture = textures[Math.floor(Math.random() * textures.length)]
-            svg = new Sprite(texture);
-            svg.x = Math.floor(Math.random() * (app.screen.width - 150)) + 50
-            svg.y = Math.floor(Math.random() * (app.screen.height - 150)) + 50
+        //     texture = textures[Math.floor(Math.random() * textures.length)]
+        //     svg = new PIXI.Sprite(texture);
+        //     svg.x = Math.floor(Math.random() * (app.screen.width - 150)) + 50
+        //     svg.y = Math.floor(Math.random() * (app.screen.height - 150)) + 50
 
-        } else {
+        // } else {
 
 
             texture = textures[textureId]
 
-            svg = new Sprite(texture);
+            svg = new PIXI.Sprite(texture);
             svg.scale.set(scale1, scale1);
+
             svg.x = x
             svg.y = y
 
@@ -774,7 +818,7 @@ function initPixi() {
 
 
 
-        }
+        // }
 
         svg.anchor.set(0.5);
         svg.zIndex = 1;
@@ -818,14 +862,14 @@ function initPixi() {
             selectorKey = v;
         }
 
+
         selectedGraphic = v;
 
         sBrushes[id].texture = textures[v]
         sBrushes[id].tid = v; 
 
-
         //console.log("leftRightSelector(dir), selectedGraphic", dir, selectedGraphic)
-        console.log(id)
+        console.log(v)
 
     }
 
@@ -931,7 +975,7 @@ function initPixi() {
             mC.removeChild(selectedToolGraphic)
         }
 
-        selectedToolGraphic = new Graphics();
+        selectedToolGraphic = new PIXI.Graphics();
         selectedToolGraphic.beginFill(0xffffff, 0.4);
         selectedToolGraphic.drawRect(x, y, 80, 80);
         selectedToolGraphic.endFill();
@@ -1057,7 +1101,7 @@ function initPixi() {
 
     function loadTextures() {
 
-        const bottomBackgroundTool = new Graphics();
+        const bottomBackgroundTool = new PIXI.Graphics();
         bottomBackgroundTool.beginFill(cols_grey);
         bottomBackgroundTool.drawRect(0, wapp.H - 80, wapp.W, 100);
         bottomBackgroundTool.endFill();
@@ -1189,7 +1233,9 @@ function initPixi() {
 
 
         } else {
-            addEmmiter(Math.ceil(Math.random()*50));
+
+            addEmmiter(Math.ceil(5+Math.random()*50));
+
         }
 
 
@@ -1228,8 +1274,12 @@ function addSprites(resources) {
 
     Object.keys(resources).forEach(key => {
         //console.log(resources[key]);
+        
         //console.log('addSprites:', key)
-        textures.push(resources[key].texture)
+
+        if(resources[key].texture) {
+            textures.push(resources[key].texture)
+        }
 
     });
 
@@ -1249,7 +1299,8 @@ function loadAssets() {
     console.log("loadAssets", wapp.data.shapes[0].n);
 
 
-    const loader = Loader.shared;
+    const loader = PIXI.Loader.shared;
+
 
     for (let i = 0; i <= wapp.data.shapes.length - 1; i++) {
 
@@ -1338,7 +1389,7 @@ function loadAssets() {
 
 
 /*function addVBrush(n) {
-    const vBrush1 = Sprite.from("./assets/brushes/vBrush-"+n+".png"); //Sprite.from(textures[5])
+    const vBrush1 = new PIXI.Sprite.from("./assets/brushes/vBrush-"+n+".png"); //Sprite.from(textures[5])
     vBrush1.zIndex = 1000000+n;
     vBrush1.name = "vBrush"+n
 
@@ -1354,6 +1405,8 @@ function addPoints(id,p) {
 
     bounce(sBrushes[id])
 
+    sound.play('boing');
+
 }
 
 
@@ -1361,13 +1414,13 @@ function setupStage() {
 
     console.log("setupStage");
 
-    mC = new Container();
+    mC = new PIXI.Container();
     mC.name = "mC";
     mC.interactive = true
     mC.buttonMode = true
     mC.sortableChildren = true
 
-    paintingArea = new Graphics();
+    paintingArea = new PIXI.Graphics();
 
     paintingArea.beginFill(cols_blue1);
     paintingArea.drawRect(0, 0, wapp.W, wapp.H);

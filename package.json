@@ -28,6 +28,7 @@
   "dependencies": {
     "@pixi/basis": "^6.1.3",
     "@pixi/core": "^6.1.3",
-    "@pixi/loaders": "^6.1.3"
+    "@pixi/loaders": "^6.1.3",
+    "@pixi/sound": "^4.0.6"
   }
 }
