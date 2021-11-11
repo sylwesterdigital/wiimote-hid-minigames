@@ -344,16 +344,31 @@ function enableControls() {
 
     wiimotes[wiiN].IrListener = (pos) => {
 
+
+        //console.log(pos[0])
+
+
         if (pos.length < 1) {
             return
         }
 
-        var _sW = 1366; //app.stage.width
-        var pX = _sW - pos[0]["x"];
+        // var _sW = 1366; //app.stage.width
+        // var pX = _sW - pos[0]["x"];
 
-        if (pX >= 1365) {
-            pX = 1365
+        // if (pX >= 1365) {
+        //     pX = 1365
+        // }
+
+        let valX = 1000 - pos[0]["x"];
+
+        if(valX < 0) {
+            valX = 0;
         }
+
+        let perc = valX/1000;
+
+        let pX = wapp.W * perc
+        //app.stage.width* perc;
 
         vBrushes[wiiN].x = pX; //max 1016
         vBrushes[wiiN].y = pos[0]["y"] //max 760
@@ -367,7 +382,9 @@ function enableControls() {
 
 
         //document.getElementById("IRdebug").innerHTML = JSON.stringify(pos, null, true)
-        document.getElementById("IRdebug").innerHTML = pos[0]["x"] + " " + pos[0]["y"] + "_pX:" + pX + " _sW:" + _sW;
+
+        //document.getElementById("IRdebug").innerHTML = pos[0]["x"] + " " + pos[0]["y"] + "_pX:" + pX + " _sW:" + _sW;
+
     }
 
 
