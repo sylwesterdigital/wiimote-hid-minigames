@@ -259,7 +259,7 @@ class Ball {
 let balls = [];
 let barticles = [];
 
-let numBalls = 3;
+let numBalls = 30;
 let spring = 0.2;
 let gravity = 0.2;
 let friction = -0.1;
@@ -271,11 +271,11 @@ function addP(i) {
 
         //let i = balls.length;
 
-        //let tx = textures[Math.floor(Math.random() * textures.length)]
-        let tx = textures[Math.floor(Math.random()*3)]
+        let tx = textures[Math.floor(Math.random() * textures.length)]
+        //let tx = textures[Math.floor(Math.random()*3)]
         const p = new PIXI.Sprite(tx);
         
-        let s1 =  0.06;//Math.random()*0.1+ 0.03;
+        let s1 =  Math.random()*0.1+ 0.03;
         
         p.scale.set(s1,s1);
         p.name = "ba_"+i;
