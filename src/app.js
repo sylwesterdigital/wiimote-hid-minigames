@@ -4,6 +4,9 @@ var contentData = "./assets/Content.json";
 import * as PIXI from 'pixi.js'
 //import { Application, Container, Graphics, Loader, Sprite, Texture, Text } from 'pixi.js'
 
+/* P5 */
+import P5  from 'p5'
+
 /* Greensock */
 import { gsap} from "gsap";
 gsap.registerPlugin(PixiPlugin);
@@ -127,6 +130,291 @@ for (let name in soundsData) {
 
 
 w.sound = sound
+
+
+/* P5 experiment */
+
+
+
+
+
+
+class Ball {
+
+  constructor(xin, yin, din, idin, oin, width, height, name) {
+    this.x = xin;
+    this.y = yin;
+    this.vx = 0;
+    this.vy = 0;
+    this.diameter = din;
+    this.id = idin;
+    this.others = oin;
+    this.width = width;
+    this.height = height;
+    this.name = name;
+
+  }
+
+  collide() {
+    for (let i = this.id + 1; i < balls.length; i++) {
+      // console.log(others[i]);
+      let dx = this.others[i].x - this.x;
+      let dy = this.others[i].y - this.y;
+      let distance = Math.sqrt(dx * dx + dy * dy);
+      let minDist = this.others[i].diameter / 2 + this.diameter / 2;
+        //console.log(distance);
+      //console.log(minDist);
+      if (distance < minDist) {
+        //console.log("2");
+        let angle = Math.atan2(dy, dx);
+        let targetX = this.x + Math.cos(angle) * minDist;
+        let targetY = this.y + Math.sin(angle) * minDist;
+        let ax = (targetX - this.others[i].x) * spring;
+        let ay = (targetY - this.others[i].y) * spring;
+        this.vx -= ax;
+        this.vy -= ay;
+        this.others[i].vx += ax;
+        this.others[i].vy += ay;
+      }
+    }
+  }
+
+  move() {
+
+    //("wund12").includes("wound")
+
+
+    if(!(String(this.name)).includes("wound")) {
+
+        this.vy += gravity;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.width = $(window).width();
+        this.height = $(window).height();
+
+
+        if (this.x + this.diameter / 2 > this.width) {
+          this.x = this.width - this.diameter / 2;
+          this.vx *= friction;
+        } else if (this.x - this.diameter / 2 < 0) {
+          this.x = this.diameter / 2;
+          this.vx *= friction;
+        }
+        if (this.y + this.diameter / 2 > this.height) {
+          this.y = this.height - this.diameter / 2;
+          this.vy *= friction;
+        } else if (this.y - this.diameter / 2 < 0) {
+          this.y = this.diameter / 2;
+          this.vy *= friction;
+        }
+
+        // if(this.y <= 100) {
+        //     // splice
+        //     balls.splice(balls.findIndex( item => item.id === this.id ),1)
+        //     barticles.splice(barticles.findIndex( item => item.id === this.id ),1)
+
+        //     app.stage.getChildByName("mC").getChildByName("ba_"+this.id).visible = false;
+
+        //     // if(app.stage.getChildByName("mC").getChildByName("ba_"+this.id)) {
+        //     //     app.stage.getChildByName("mC").getChildByName("ba_"+this.id).destroy()
+        //     // }
+        //     console.log(this.id)
+        //     //mC.getChildByName(this.name).destroy();
+        // }
+
+    } else {
+        //console.log(this.name)
+        for(let g in wiimotes) {
+            let id = wiimotes[g].id;
+            //console.log(id)
+            if(this.name == "wound"+id && window.mouse) {
+                //this.x = window.mouse.x
+                //this.y = window.mouse.y
+                this.x = vBrushes[id].x;
+                this.y = vBrushes[id].y;
+            }
+        }
+    }
+  }
+
+  display() {
+
+    //ellipse(this.x, this.y, this.diameter, this.diameter);
+    //console.log(this.name)
+
+    if(barticles[this.id]) {
+
+        barticles[this.id].x = this.x
+        barticles[this.id].y = this.y
+        barticles[this.id].angle += this.vx
+
+    }
+
+
+  }
+
+}
+
+
+let balls = [];
+let barticles = [];
+
+let numBalls = 3;
+let spring = 0.2;
+let gravity = 0.2;
+let friction = -0.1;
+
+let width = wapp.W 
+let height = wapp.H;
+
+function addP(i) {
+
+        //let i = balls.length;
+
+        //let tx = textures[Math.floor(Math.random() * textures.length)]
+        let tx = textures[Math.floor(Math.random()*3)]
+        const p = new PIXI.Sprite(tx);
+        
+        let s1 =  0.06;//Math.random()*0.1+ 0.03;
+        
+        p.scale.set(s1,s1);
+        p.name = "ba_"+i;
+        
+
+        // p.angle = Math.random()*5;
+        // p.angleSpeed = Math.random()*2 - Math.random()*2;
+
+        p.anchor.set(0.5)
+        // p.x = -p.width - Math.random()*300
+        // p.y = Math.floor(Math.random() * (app.screen.height - 150)) + 50;
+        // p.speedX = Math.random()*2 + 0.2;
+        // p.speedY = Math.random()*0.5 - Math.random()*0.5;
+        
+        //p.zIndex = 1;
+        
+        
+
+        //p.x = balls[i].x
+        //p.y = balls[i].y
+
+
+        //console.log(p.x,p.y)
+
+
+        mC.addChild(p);
+
+        barticles.push(p)
+
+}
+
+w.barticles = barticles;
+
+
+
+
+function addStaticBall() {
+
+    let i = balls.length;
+    let wi = String(wiimotes.length-1);
+    //console.log(wi)
+
+
+
+    balls[i] = new Ball(
+
+      Math.random()*$(window).width(),
+      Math.random()*$(window).height(),
+      100,
+      i,
+      balls,
+      width,
+      height,
+      "wound"+wi
+
+    );
+
+
+        //let tx = textures[Math.floor(Math.random() * textures.length)]
+
+        const p = new PIXI.Sprite.from("./assets/Samsung_Internet_logo.png");
+        
+        let s1 = 0.22;//Math.random()*0.1+ 0.01;
+        
+        p.scale.set(s1,s1);
+        
+        p.name = "wound"+wiimotes.length-1;
+        
+
+        // p.angle = Math.random()*5;
+        // p.angleSpeed = Math.random()*2 - Math.random()*2;
+
+        p.anchor.set(0.5)
+        // p.x = -p.width - Math.random()*300
+        // p.y = Math.floor(Math.random() * (app.screen.height - 150)) + 50;
+        // p.speedX = Math.random()*2 + 0.2;
+        // p.speedY = Math.random()*0.5 - Math.random()*0.5;
+        
+        //p.zIndex = 1;
+        
+        
+
+        //p.x = balls[i].x
+        //p.y = balls[i].y
+
+
+        //console.log(p.x,p.y)
+
+
+        mC.addChild(p);
+
+        barticles.push(p)
+
+
+
+}
+
+w.addStaticBall = addStaticBall;
+
+
+
+function addBalls() {
+
+    console.log("addBalls", numBalls)
+
+
+    for (let i = 0; i < numBalls; i++) {
+
+        balls[i] = new Ball(
+          Math.random()*$(window).width(),
+          Math.random()*$(window).height(),
+          (Math.random() * 70) + 5,
+          i,
+          balls,
+          width,
+          height,
+          "ball"+i
+        );
+      }
+
+    window.balls = balls;
+
+    for (let i = 0; i < numBalls; i++) {
+        addP(i);
+    }
+
+    //addStaticBall();
+
+
+}
+
+
+window.addBalls = addBalls;
+
+
+// lets add
+
+
+
 
 
 
@@ -431,6 +719,9 @@ function initController() {
             addBrushes(wiimotes.length-1)
 
 
+            addStaticBall()
+
+
             //playBoing(1);
             //sound.play('boing')
 
@@ -615,56 +906,42 @@ let particles = []
 w.particles = particles;
 let particlesK = 0
 
+
 function addEmmiter(n) {
 
     console.log("addEmmiter",n)
 
-
-    // add particles on the left an
-    // d move them to the right them back them to the left
-
     for(var i=0; i < n; i++) {
-
-        let tx = textures[Math.floor(Math.random() * textures.length)]
-
+        
+        let tx = textures[0]
         const p = new PIXI.Sprite(tx);
-
-
-
-        let s1 = Math.random()*0.1+ 0.01;
-
+        
+        let s1 = 2;//Math.random()*0.1+ 0.01;
+        
         p.scale.set(s1,s1);
-
         p.name = "p_"+parseInt(i+particlesK);
+        
 
         p.angle = Math.random()*5;
-        p.angleSet = Math.random()*2 - Math.random()*2;
+        p.angleSpeed = Math.random()*2 - Math.random()*2;
 
         p.anchor.set(0.5)
-
-
         p.x = -p.width - Math.random()*300
         p.y = Math.floor(Math.random() * (app.screen.height - 150)) + 50;
-
         p.speedX = Math.random()*2 + 0.2;
         p.speedY = Math.random()*0.5 - Math.random()*0.5;
-
+        
         //p.zIndex = 1;
-
         particles.push(p)
-
-
         mC.addChild(p);
 
     }
-
     particlesK += n;    
-
-
-    document.getElementById("game-msg").innerHTML = "addEmmiter: "+n
-
+    document.getElementById("game-msg").innerHTML = "Particles: "+n
 }
-w.addEmmiter = addEmmiter
+w.addEmmiter = addEmmiter;
+
+
 
 
 function addBrushes(id) {
@@ -720,11 +997,13 @@ function addHUD(id) {
         let color = colors[id];
 
         // EXTRA LIFES
-        //---------------- 
+        //----------------
+        let fontSize = 44; 
+        let fY = fontSize*0.2;
         let n = parseInt(id)+1;
-        let r = new PIXI.Text("Player "+n+": 0 PTS", {fontSize: 24, fontFamily: "Avenir, Roboto, sans-serif", align: "right", fill:color});
-        r.position.x = 16;
-        r.position.y = 50+id*36;
+        let r = new PIXI.Text("Player "+n+": 0 PTS", {fontSize: fontSize, fontFamily: "Avenir, Roboto, sans-serif", align: "right", fill:color});
+        r.position.x = 44;
+        r.position.y = 50+id*(fontSize+fY);
         r.name = "R"+id
 
         mC.addChild(r);    
@@ -1160,6 +1439,11 @@ function initPixi() {
     changeTool("paint");
 
 
+
+
+
+
+
     app.ticker.add((delta) => {
 
         if (app.playing) {
@@ -1207,7 +1491,7 @@ function initPixi() {
                 p.x += p.speedX;
                 p.y += p.speedY;
 
-                p.angle += p.angleSet;
+                p.angle += p.angleSpeed;
 
                 //console.log(wapp.W, item.x)
                 /* check collision */
@@ -1251,9 +1535,33 @@ function initPixi() {
 
         } else {
 
-            addEmmiter(Math.ceil(5+Math.random()*50));
+            //addEmmiter(Math.ceil(5+Math.random()*50));
 
         }
+
+
+
+        /* P5 balls */
+
+    if (balls.length > 0) {
+
+        balls.forEach(ball => {
+             ball.collide();
+             ball.move();
+             ball.display();
+
+        });
+
+    } else {
+        addBalls();
+        
+        //addStaticBall();
+
+    }
+
+
+
+
 
 
 
@@ -1267,6 +1575,20 @@ function initPixi() {
 
 
 }
+
+
+function setupGamesMenu() {
+
+    // show menu
+
+
+    
+}
+
+w.setupGamesMenu = setupGamesMenu;
+
+
+
 
 
 function resizeGame() {
@@ -1486,11 +1808,56 @@ function setupStage() {
 
                         */
 
+let mouse;
+//window.mouse = mouse
+
+
+function captureMouse(event) {
+
+  let mouse = {x: 0, y: 0, event: null},
+      body_scrollLeft = document.body.scrollLeft,
+      element_scrollLeft = document.documentElement.scrollLeft,
+      body_scrollTop = document.body.scrollTop,
+      element_scrollTop = document.documentElement.scrollTop
+
+      // offsetLeft = element.offsetLeft,
+      // offsetTop = element.offsetTop;
+    
+    let x, y;
+
+    if (event.pageX || event.pageY) {
+      x = event.pageX;
+      y = event.pageY;
+    } else {
+      x = event.clientX + body_scrollLeft + element_scrollLeft;
+      y = event.clientY + body_scrollTop + element_scrollTop;
+    }
+
+    // x -= offsetLeft;
+    // y -= offsetTop;
+    
+    mouse.x = x;
+    mouse.y = y;
+    mouse.event = event;
+
+    window.mouse = mouse;
+
+    //console.log(window.mouse)
+
+    //return mouse;
+
+
+
+
+}
+
 
 function loadConfig(callback) {
+
     var xobj = new XMLHttpRequest();
     xobj.overrideMimeType("application/json");
     xobj.open('GET', contentData, true);
+
     xobj.onreadystatechange = function() {
         //console.log('xobj.readyState',xobj.readyState)
         if (xobj.readyState == 4 && xobj.status == "200") {
@@ -1499,6 +1866,7 @@ function loadConfig(callback) {
     };
     xobj.send(null);
 }
+
 
 
 //read setup
@@ -1521,3 +1889,8 @@ initConfig();
 
 
 window.addEventListener('resize', resizeGame, false);
+window.addEventListener('mousemove', captureMouse, false);
+
+
+
+

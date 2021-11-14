@@ -29,6 +29,47 @@ button {
     text-align: center;
 }
 
+.game-bu {
+    font-size: 2rem;
+    color: #fff !important;
+    text-transform: uppercase;
+    text-decoration: none;
+    background: #ff000000;
+    padding: 1rem;
+    margin: 0.1rem;
+    border-radius: 9px;
+    border-color: rgba(255, 255, 255, 1);
+    display: inline-block;
+    border: 4px solid;
+    transition: all 0.4s ease 0s;
+    animation-name: blinking;
+    animation-duration: 10s;
+    animation-iteration-count: 100;
+    min-width: 33%;
+}
+
+#games-menu {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top:0;
+    padding: 0;
+    border: 0;
+    text-align: center;
+}
+
+.v-holder {
+    position: relative;
+    top: 50%;
+    transform: perspective(1px) translateY(-50%);
+}
+
+.hide-off {
+    display: none;
+}
+
+
 .bu {
     font-size: 2rem;
     color: #fff !important;
