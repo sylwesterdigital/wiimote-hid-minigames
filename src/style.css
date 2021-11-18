@@ -13,11 +13,6 @@ body {
 }
 
 
-#screen {
-    border: 0;
-    padding: 0;
-
-}
 
 button {
     display: block;
@@ -112,6 +107,7 @@ canvas {
     position: absolute;
     left: 0;
     top: 0;
+    z-index: -100;
     /*    border: 5px solid black;
     padding: 10px;
     margin-left: 50px;*/
@@ -131,8 +127,10 @@ canvas {
     -moz-transform-style: preserve-3d;
     transform-style: preserve-3d;
     display: block;
-    height: 100%;
-    width: 100%;
+    margin: 0;
+    padding: 0;
+    height: 90%;
+    width: 90%;
     position: absolute;
     text-align: center;
 }
@@ -167,8 +165,8 @@ canvas {
     position: absolute;
     color: white;
     background: rgba(0, 0, 0, 0.25);
-    padding: 0.3rem;
-    margin: 0.3rem;
+    padding: 0;
+    margin: 0;
     left: 0;
     top: 0;
 }
@@ -177,11 +175,11 @@ canvas {
     position: absolute;
     color: white;
     background: rgba(0, 0, 0, 0.25);
-    padding: 0.3rem;
-    margin: 0.3rem;
+    padding: 0;
+    margin: 0;
     align-content: center;
     top: 0;
-    width: 100%;
+    width: 95%;
     text-align: center;    
 }
 
@@ -193,8 +191,8 @@ canvas {
     position: absolute;
     color: white;
     background: rgba(0, 0, 0, 0.25);
-    padding: 0.3rem;
-    margin: 0.3rem;
+    padding: 0;
+    margin: 0;
     align-content: center;
     bottom: 0;
     width: 100%;

@@ -259,7 +259,7 @@ class Ball {
 let balls = [];
 let barticles = [];
 
-let numBalls = 30;
+let numBalls = 10;
 let spring = 0.2;
 let gravity = 0.2;
 let friction = -0.1;
@@ -311,14 +311,42 @@ w.barticles = barticles;
 
 
 
+/* 
+        Goal Posts 
+    ---------------------
+                            */
+
+
+var goalPosts = [];
+
+function addGoalPost() {
+
+
+    // Circle + line style 1
+    const c = new PIXI.Graphics();
+    c.lineStyle(2, 0xFEEB77, 1);
+    c.beginFill(0x650A5A, 0.1);
+    c.drawCircle(0, 0, 100);
+    c.endFill();
+
+    const tx = app.renderer.generateTexture(c);
+    const spr = PIXI.Sprite.from(tx);
+    spr.name = "GoalPost"+goalPosts.length;
+    goalPosts.push(spr)
+
+    mC.addChild(spr);
+
+}
+
+w.addGoalPost = addGoalPost;
+
+
 
 function addStaticBall() {
 
     let i = balls.length;
     let wi = String(wiimotes.length-1);
     //console.log(wi)
-
-
 
     balls[i] = new Ball(
 
@@ -632,47 +660,27 @@ function enableControls() {
 
     wiimotes[wiiN].IrListener = (pos) => {
 
-
-        //console.log(pos[0])
-
-
         if (pos.length < 1) {
             return
         }
 
-        // var _sW = 1366; //app.stage.width
-        // var pX = _sW - pos[0]["x"];
-
-        // if (pX >= 1365) {
-        //     pX = 1365
-        // }
-
         let valX = 1000 - pos[0]["x"];
-
         if(valX < 0) {
             valX = 0;
         }
 
         let perc = valX/1000;
+        let pX = wapp.W * perc;
 
-        let pX = wapp.W * perc
-        //app.stage.width* perc;
-
-        vBrushes[wiiN].x = pX; //max 1016
-        vBrushes[wiiN].y = pos[0]["y"] //max 760
-
+        vBrushes[wiiN].x = pX; 
+        vBrushes[wiiN].y = pos[0]["y"];
 
         sBrushes[wiiN].x = vBrushes[wiiN].x;
         sBrushes[wiiN].y = vBrushes[wiiN].y;
-
+        
         sBrushes[wiiN].angle = vBrushes[wiiN].angle * 5; //90*(Math.PI/180)
-
-
-
         //document.getElementById("IRdebug").innerHTML = JSON.stringify(pos, null, true)
-
         //document.getElementById("IRdebug").innerHTML = pos[0]["x"] + " " + pos[0]["y"] + "_pX:" + pX + " _sW:" + _sW;
-
     }
 
 
@@ -1024,13 +1032,12 @@ function initPixi() {
 
     console.log("initPixi");
 
-    let view = document.getElementById("screen")
+    //let view = document.getElementById("screen")
 
     app = new PIXI.Application({
         /*        width: wapp.W, 
                 height: wapp.H, */
         backgroundColor: cols_blue1,
-        resolution: window.devicePixelRatio || 1,
         resizeTo: window
     });
 
@@ -1045,7 +1052,8 @@ function initPixi() {
 
     window.app = app
 
-    view.appendChild(app.view);
+    //view.appendChild(app.view);
+    document.body.appendChild(app.view);
 
     app.stage.addChild(mC);
 
@@ -1593,12 +1601,16 @@ w.setupGamesMenu = setupGamesMenu;
 
 function resizeGame() {
 
-    console.log("resizeGame:", $(window).width())
+    console.log("resizeGame: >", $(window).width())
 
     wapp.W = $(window).width();
     wapp.H = $(window).height();
 
     document.getElementById("IRdebug").innerHTML = wapp.W + " x " + wapp.H;
+
+    app.resize(wapp.W, wapp.H);
+
+
 
 
 }
