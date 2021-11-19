@@ -115,6 +115,7 @@ let textures = []
 
 
 const soundsData = {
+    hit1: './assets/audio/fx/Hit_Hurt4.wav',    
     fail1: './assets/audio/fx/ohh1.mp3',
     fail2: './assets/audio/fx/ohh2.mp3',
     fail3: './assets/audio/fx/ohh3.mp3',
@@ -152,60 +153,137 @@ class Ball {
     this.width = width;
     this.height = height;
     this.name = name;
+    this.hit = 0;
 
   }
 
   collide() {
-    for (let i = this.id + 1; i < balls.length; i++) {
-      // console.log(others[i]);
-      let dx = this.others[i].x - this.x;
-      let dy = this.others[i].y - this.y;
-      let distance = Math.sqrt(dx * dx + dy * dy);
-      let minDist = this.others[i].diameter / 2 + this.diameter / 2;
-        //console.log(distance);
-      //console.log(minDist);
-      if (distance < minDist) {
-        //console.log("2");
-        let angle = Math.atan2(dy, dx);
-        let targetX = this.x + Math.cos(angle) * minDist;
-        let targetY = this.y + Math.sin(angle) * minDist;
-        let ax = (targetX - this.others[i].x) * spring;
-        let ay = (targetY - this.others[i].y) * spring;
-        this.vx -= ax;
-        this.vy -= ay;
-        this.others[i].vx += ax;
-        this.others[i].vy += ay;
-      }
-    }
+
+
+    // if(!(String(this.name)).includes("wound") && !(String(this.name)).includes("post")) {
+
+        for (let i = this.id + 1; i < balls.length; i++) {
+
+
+          // console.log(others[i]);
+          let dx = this.others[i].x - this.x;
+          let dy = this.others[i].y - this.y;
+          let distance = Math.sqrt(dx * dx + dy * dy);
+          let minDist = this.others[i].diameter / 2 + this.diameter / 2;
+
+
+            // if(String(this.name).includes("post") && distance < 150) {
+            //     console.log("collision with post", this.name, this.id)
+            // }
+
+
+            //console.log(distance);
+          //console.log(minDist);
+          if (distance < minDist) {
+            //console.log("2",this.name,this.others[i].name);
+
+            
+
+            let angle = Math.atan2(dy, dx);
+            let targetX = this.x + Math.cos(angle) * minDist;
+            let targetY = this.y + Math.sin(angle) * minDist;
+            let ax = (targetX - this.others[i].x) * spring;
+            let ay = (targetY - this.others[i].y) * spring;
+            this.vx -= ax;
+            this.vy -= ay;
+            this.others[i].vx += ax;
+            this.others[i].vy += ay;
+
+
+            if(String(this.name).includes("ball") && String(this.others[i].name).includes("post")) {
+
+                console.log("BOOM",this.name,'==>',this.others[i].name)
+
+                if(this.others[i].name == "post1") {
+                    addPoints(0,-10)
+
+                }
+                if(this.others[i].name == "post2") {
+                    addPoints(1,-10)
+                }
+
+                if(this.others[i].name == "post3") {
+                    addPoints(2,-10)
+                }
+
+                if(this.others[i].name == "post4") {
+                    addPoints(3,-10)
+                }                                
+
+                sound.play('hit1')
+                this.hit = 1;
+
+
+            }
+
+
+          }
+
+
+
+
+
+
+
+        }
+
+
+//    }
+
+
+
+
+
+
+
+
   }
 
   move() {
 
     //("wund12").includes("wound")
 
+    //
+    // Normal Balls
+    // --------------
+    if(!(String(this.name)).includes("wound") && !(String(this.name)).includes("post")) {
 
-    if(!(String(this.name)).includes("wound")) {
+        if(this.hit != 1) {
 
-        this.vy += gravity;
-        this.x += this.vx;
-        this.y += this.vy;
-        this.width = $(window).width();
-        this.height = $(window).height();
+            this.vy += gravity;
+            this.x += this.vx;
+            this.y += this.vy;
+            this.width = $(window).width();
+            this.height = $(window).height();
 
 
-        if (this.x + this.diameter / 2 > this.width) {
-          this.x = this.width - this.diameter / 2;
-          this.vx *= friction;
-        } else if (this.x - this.diameter / 2 < 0) {
-          this.x = this.diameter / 2;
-          this.vx *= friction;
-        }
-        if (this.y + this.diameter / 2 > this.height) {
-          this.y = this.height - this.diameter / 2;
-          this.vy *= friction;
-        } else if (this.y - this.diameter / 2 < 0) {
-          this.y = this.diameter / 2;
-          this.vy *= friction;
+            if (this.x + this.diameter / 2 > this.width) {
+              this.x = this.width - this.diameter / 2;
+              this.vx *= friction;
+            } else if (this.x - this.diameter / 2 < 0) {
+              this.x = this.diameter / 2;
+              this.vx *= friction;
+            }
+            if (this.y + this.diameter / 2 > this.height) {
+              this.y = this.height - this.diameter / 2;
+              this.vy *= friction;
+            } else if (this.y - this.diameter / 2 < 0) {
+              this.y = this.diameter / 2;
+              this.vy *= friction;
+            }
+
+        } else {
+
+            this.x = -100;
+            this.y = -100;
+
+            //balls.splice(balls.findIndex( item => item.id === this.id ),1)
+
         }
 
         // if(this.y <= 100) {
@@ -227,6 +305,10 @@ class Ball {
         for(let g in wiimotes) {
             let id = wiimotes[g].id;
             //console.log(id)
+
+            //
+            // Players Wounds
+            // ---------------
             if(this.name == "wound"+id && window.mouse) {
                 //this.x = window.mouse.x
                 //this.y = window.mouse.y
@@ -259,12 +341,12 @@ class Ball {
 let balls = [];
 let barticles = [];
 
-let numBalls = 10;
+let numBalls = 20;
 let spring = 0.2;
 let gravity = 0.2;
 let friction = -0.1;
 
-let width = wapp.W 
+let width = wapp.W; 
 let height = wapp.H;
 
 function addP(i) {
@@ -321,24 +403,74 @@ var goalPosts = [];
 
 function addGoalPost() {
 
+    let pad = 20;
 
     // Circle + line style 1
     const c = new PIXI.Graphics();
+
     c.lineStyle(2, 0xFEEB77, 1);
     c.beginFill(0x650A5A, 0.1);
-    c.drawCircle(0, 0, 100);
+    c.drawCircle(0, 0, 66);
     c.endFill();
 
     const tx = app.renderer.generateTexture(c);
     const spr = PIXI.Sprite.from(tx);
-    spr.name = "GoalPost"+goalPosts.length;
+    spr.name = "goalPost"+goalPosts.length;
+
+    spr.anchor.set(0.55)
+
     goalPosts.push(spr)
 
+
+    if(goalPosts.length == 1) {
+        spr.x = 150;
+        spr.y = 150;
+    }
+    if(goalPosts.length == 2) {
+        spr.x = wapp.W - pad - spr.width;
+        spr.y = 150;
+    }
+    if(goalPosts.length == 3) {
+        spr.x = 350;
+        spr.y = 150;
+    }
+    if(goalPosts.length == 4) {
+        spr.x = wapp.W - pad - spr.width - 200;
+        spr.y = 150;
+    }        
+
+/*    if(goalPosts.length == 3) {
+        spr.x = 150;
+        spr.y = wapp.H - 250;
+    }
+    if(goalPosts.length == 4) {
+        spr.x = wapp.W - pad - spr.width;
+        spr.y = wapp.H - 250;
+    }*/
+    
+    balls[balls.length] = new Ball(
+
+      spr.x,
+      spr.y,
+      spr.width,
+      balls.length,
+      balls,
+      spr.width,
+      spr.height,
+      "post"+goalPosts.length
+
+    );  
+
+
     mC.addChild(spr);
+    barticles.push(spr)  
+
+
 
 }
 
 w.addGoalPost = addGoalPost;
+w.goalPosts = goalPosts;
 
 
 
@@ -360,6 +492,8 @@ function addStaticBall() {
       "wound"+wi
 
     );
+
+
 
 
         //let tx = textures[Math.floor(Math.random() * textures.length)]
@@ -431,6 +565,9 @@ function addBalls() {
     }
 
     //addStaticBall();
+
+
+
 
 
 }
@@ -996,6 +1133,17 @@ function bounce(r) {
 
 }
 
+function fadein(r) {
+
+    let tl3 = gsap.timeline({delay: 0,repeat: 0,repeatDelay: 0});
+    tl3
+        .from(r, 0.03, { ease: "power1", alpha:0, yoyo:true, repeat:2, repeatDelay: 0},"+=0") 
+
+}
+w.fadein = fadein;
+
+
+
 
 function addHUD(id) {
 
@@ -1006,18 +1154,20 @@ function addHUD(id) {
 
         // EXTRA LIFES
         //----------------
-        let fontSize = 44; 
+        let fontSize = 88; 
         let fY = fontSize*0.2;
         let n = parseInt(id)+1;
-        let r = new PIXI.Text("Player "+n+": 0 PTS", {fontSize: fontSize, fontFamily: "Avenir, Roboto, sans-serif", align: "right", fill:color});
-        r.position.x = 44;
-        r.position.y = 50+id*(fontSize+fY);
+        let r = new PIXI.Text("Player "+n+" JOINED!", {fontSize: fontSize, fontFamily: "DIN Condensed", align: "right", fill:color});
+        r.position.x = wapp.W/2 - r.width/2;
+        r.position.y = 150+id*(fontSize+fY);
         r.name = "R"+id
 
         mC.addChild(r);    
 
 
         sound.play('joined');
+
+        addGoalPost()
 
 
     // body...
@@ -1752,11 +1902,25 @@ function addPoints(id,p) {
 
     let n = parseInt(id)+1;
     wiimotes[id].points +=p;
-    app.stage.getChildByName("mC").getChildByName("R"+id).text = "Player "+n+": "+wiimotes[id].points+" PTS";
+    let ptxt = app.stage.getChildByName("mC").getChildByName("R"+id);
 
-    bounce(sBrushes[id])
+    //ptxt.text = ""+n+": "+wiimotes[id].points+"";
+    ptxt.text = ""+wiimotes[id].points+"";
+
+    //bounce(sBrushes[id])
+
+    //bounce(ptxt)
+    fadein(ptxt)
 
     sound.play('boing');
+
+
+    // position
+
+    ptxt.x = app.stage.getChildByName("mC").getChildByName("goalPost"+id).x - ptxt.width/2;
+    ptxt.y = app.stage.getChildByName("mC").getChildByName("goalPost"+id).y - ptxt.height/2;
+
+
 
 }
 
