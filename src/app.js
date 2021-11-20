@@ -5,7 +5,7 @@ import * as PIXI from 'pixi.js'
 //import { Application, Container, Graphics, Loader, Sprite, Texture, Text } from 'pixi.js'
 
 /* P5 */
-import P5  from 'p5'
+//import P5  from 'p5'
 
 /* Greensock */
 import { gsap} from "gsap";
@@ -135,8 +135,19 @@ w.sound = sound
 
 /* P5 experiment */
 
+function updateUserScore(owner) {
 
+    if(owner) {
 
+        var val = parseFloat(String(owner).substr(5,3));
+        wiimotes[val].data.score += 10;
+        let d = wiimotes[val].data;
+        let user = d.emoji +" "+d.nickname;
+        let score = parseInt(d.score);
+        app.stage.getChildByName("mC").getChildByName("vBrush"+val).children[1].text = ""+user+": +"+score;
+    }
+
+}
 
 
 
@@ -154,6 +165,7 @@ class Ball {
     this.height = height;
     this.name = name;
     this.hit = 0;
+    this.owner = ''
 
   }
 
@@ -194,6 +206,13 @@ class Ball {
             this.others[i].vx += ax;
             this.others[i].vy += ay;
 
+            if(String(this.others[i].name).includes("wound")) {
+
+                //console.log("KICK",this.name,'==>',this.others[i].name)
+                this.owner = this.others[i].name;
+
+            }
+
 
             if(String(this.name).includes("ball") && String(this.others[i].name).includes("post")) {
 
@@ -217,6 +236,11 @@ class Ball {
 
                 sound.play('hit1')
                 this.hit = 1;
+                console.log("scored:",this.owner)
+
+                updateUserScore(this.owner)
+
+                //ptxt.text = ""+wiimotes[id].points+"";
 
 
             }
@@ -281,6 +305,8 @@ class Ball {
 
             this.x = -100;
             this.y = -100;
+
+            //console.log("OUT")
 
             //balls.splice(balls.findIndex( item => item.id === this.id ),1)
 
@@ -783,14 +809,14 @@ function enableControls() {
             vBrushes[wiiN].angle = (x * -1 + 120) * -1;
             let angles = String(vBrushes[wiiN].angle).substr(0, 4)
 
-            document.getElementById('accA').innerHTML = angles
+            //document.getElementById('accA').innerHTML = angles
         }
 
         //document.getElementById('accX').innerHTML = x
         //document.getElementById('accY').innerHTML = y
         //document.getElementById('accZ').innerHTML = z
 
-        document.getElementById('accXYZ').innerHTML = x + " " + y + " " + z;
+        //document.getElementById('accXYZ').innerHTML = x + " " + y + " " + z;
 
 
     }
@@ -829,21 +855,122 @@ window.enableControls = enableControls
 
 
 
-function initController() {
 
-    console.log("initController - buttonsW")
+var emojis = ['🙈 See-No-Evil Monkey','🙉 Hear-No-Evil Monkey','🙊 Speak-No-Evil Monkey','💥 Collision','💫 Dizzy','💦 Sweat Droplets','💨 Dashing Away','🐵 Monkey Face','🐒 Monkey','🦍 Gorilla','🐶 Dog Face','🐕 Dog','🐩 Poodle','🐺 Wolf Face','🦊 Fox Face','🐱 Cat Face','🐈 Cat','🦁 Lion Face','🐯 Tiger Face','🐅 Tiger','🐆 Leopard','🐴 Horse Face','🐎 Horse','🦄 Unicorn Face','🦓 Zebra','🐮 Cow Face','🐂 Ox','🐃 Water Buffalo','🐄 Cow','🐷 Pig Face','🐖 Pig','🐗 Boar','🐽 Pig Nose','🐏 Ram','🐑 Ewe','🐐 Goat','🐪 Camel','🐫 Two-Hump Camel','🦒 Giraffe','🐘 Elephant','🦏 Rhinoceros','🐭 Mouse Face','🐁 Mouse','🐀 Rat','🐹 Hamster Face','🐰 Rabbit Face','🐇 Rabbit','🐿 Chipmunk','🦔 Hedgehog','🦇 Bat','🐻 Bear Face','🐨 Koala','🐼 Panda Face','🐾 Paw Prints','🦃 Turkey','🐔 Chicken','🐓 Rooster','🐣 Hatching Chick','🐤 Baby Chick','🐥 Front-Facing Baby Chick','🐦 Bird','🐧 Penguin','🕊 Dove','🦅 Eagle','🦆 Duck','🦉 Owl','🐸 Frog Face','🐊 Crocodile','🐢 Turtle','🦎 Lizard','🐍 Snake','🐲 Dragon Face','🐉 Dragon','🦕 Sauropod','🦖 T-Rex','🐳 Spouting Whale','🐋 Whale','🐬 Dolphin','🐟 Fish','🐠 Tropical Fish','🐡 Blowfish','🦈 Shark','🐙 Octopus','🐚 Spiral Shell','🐌 Snail','🦋 Butterfly','🐛 Bug','🐜 Ant','🐝 Honeybee','🐞 Lady Beetle','🦗 Cricket','🕷 Spider','🕸 Spider Web','🦂 Scorpion','💐 Bouquet','🌸 Cherry Blossom','💮 White Flower','🏵 Rosette','🌹 Rose','🥀 Wilted Flower','🌺 Hibiscus','🌻 Sunflower','🌼 Blossom','🌷 Tulip','🌱 Seedling','🌲 Evergreen Tree','🌳 Deciduous Tree','🌴 Palm Tree','🌵 Cactus','🌾 Sheaf of Rice','🌿 Herb','☘ Shamrock','🍀 Four Leaf Clover','🍁 Maple Leaf','🍂 Fallen Leaf','🍃 Leaf Fluttering in Wind','🍄 Mushroom','🌰 Chestnut','🦀 Crab','🦐 Shrimp','🦑 Squid','🌍 Globe Showing Europe-Africa','🌎 Globe Showing Americas','🌏 Globe Showing Asia-Australia','🌑 New Moon','🌒 Waxing Crescent Moon','🌓 First Quarter Moon','🌔 Waxing Gibbous Moon','🌕 Full Moon','🌖 Waning Gibbous Moon','🌗 Last Quarter Moon','🌘 Waning Crescent Moon','🌙 Crescent Moon','🌚 New Moon Face','🌛 First Quarter Moon Face','🌜 Last Quarter Moon Face','☀ Sun','🌝 Full Moon Face','🌞 Sun With Face','⭐ Star','🌟 Glowing Star','🌠 Shooting Star','☁ Cloud','⛅ Sun Behind Cloud','⛈ Cloud With Lightning and Rain','🌤 Sun Behind Small Cloud','🌥 Sun Behind Large Cloud','🌦 Sun Behind Rain Cloud','🌧 Cloud With Rain','🌨 Cloud With Snow','🌩 Cloud With Lightning','🌪 Tornado','🌫 Fog','🌬 Wind Face','🌈 Rainbow','☂ Umbrella','☔ Umbrella With Rain Drops','⚡ High Voltage','❄ Snowflake','☃ Snowman','⛄ Snowman Without Snow','☄ Comet','🔥 Fire','💧 Droplet','🌊 Water Wave','🎄 Christmas Tree','✨ Sparkles','🎋 Tanabata Tree','🎍 Pine Decoration'];
 
-    var buttonsW = document.getElementById("buttonsW")
+emojis.rand = {
+    give: function() {
+        var rs = Math.floor(Math.random()*emojis.length-1);
+        var em = emojis[rs];
+        var emoji = em.split(' ')[0];
+        var name = em.substr(2,em.length);
+        return {emoji:emoji,name:name,pos:rs};
+    },
+    get: function(num) {
+        var em = emojis[num];
+        var emoji = em.split(' ')[0];
+        var name = em.substr(2,em.length);
+        return {emoji:emoji,name:name,pos:num};     
+    }
+    
+}
 
-    var conBut = document.createElement("button");
 
-    conBut.innerText = "+ "+(wiimotes.length+1);
+/* 
+    Personalization 
+    --------------------
 
-    conBut.className = "bu";
-    conBut.id = "request-hid-device"
+    */
 
-    conBut.onclick = async function() { // Note this is a function
-        // controller.newDevice(pop, _connected)
+function create_UUID() {
+    var dt = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (dt + Math.random() * 16) % 16 | 0;
+        dt = Math.floor(dt / 16);
+        return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+    return uuid;
+}
+
+var localStorage = window.localStorage;
+var dataKeys = {
+    data: function(val) {
+        return (typeof(val) === 'undefined' ? localStorage.userData : localStorage.userData = val);
+    }
+}
+
+var user_data = {};
+var players_data = []
+w.players_data = players_data;
+
+
+//var players = []
+
+if (!dataKeys.data()) {
+  
+    user_data.id = 'Anon' + Math.random() * 1000;
+    user_data.emoji = emojis.rand.give().emoji;
+    user_data.uid = create_UUID();
+    user_data.nickname = 'Anon';
+    user_data.bio = "I'm nobody."
+    user_data.attachment = '';
+    user_data.score = 0;
+    user_data.games = {};
+
+    dataKeys.data(JSON.stringify(user_data));
+  
+    // document.getElementById('profile-b').innerHTML = user_data.emoji;
+    // document.getElementById('profile-avatar').innerHTML = user_data.emoji;
+    // document.getElementById('ta-nickname').innerHTML = user_data.nickname;
+    // document.getElementById('ta-bio').innerHTML = user_data.bio;  
+
+} else {
+
+    user_data = JSON.parse(dataKeys.data());
+    console.log('chat_id:', user_data.id)
+    // document.getElementById('profile-b').innerHTML = user_data.emoji;
+    // document.getElementById('profile-avatar').innerHTML = user_data.emoji;
+    // document.getElementById('ta-nickname').innerHTML = user_data.nickname;
+    // document.getElementById('ta-bio').innerHTML = user_data.bio;  
+}
+
+w.user_data = user_data;
+
+
+
+
+
+function userConfig() {
+
+    /* Avatar / Profile */
+
+
+    $('#profile-b').on('click', function (e) {
+        e.preventDefault();
+        document.getElementById("profile-c").style.display = "block";
+        //document.getElementById("profile-b").style.display = "none";
+      
+        $('#ta-nickname').height(53);
+        $('#ta-bio').height(53);
+       
+    });
+
+    document.getElementById("profile-save-b").onclick = async function(e) {
+
+        e.preventDefault();
+
+        user_data.nickname = $('#ta-nickname').val().replace(/(\r\n|\n|\r)/gm, " ");
+        user_data.bio = $('#ta-bio').val().replace(/(\r\n|\n|\r)/gm, "");
+        
+        dataKeys.data(JSON.stringify(user_data));
+
+        players_data.push(user_data);
+
+
+        // //console.log(user_data)
+        // //dataKeys.data(JSON.stringify(user_data));
+        // document.getElementById("profile-c").style.display = "none";
+        // //document.getElementById("profile-b").style.display = "block";
 
         try {
 
@@ -856,31 +983,23 @@ function initController() {
             const wiimote = new WIIMote(device)
 
             wiimotes.push(wiimote);
+            wiimotes[wiimotes.length-1].data = players_data[wiimotes.length-1]
 
-            conBut.innerText = "+ "+(wiimotes.length+1);
+            document.getElementById("request-hid-device").innerText = "+ "+(wiimotes.length+1);
 
             addHUD(wiimotes.length-1)
 
             addBrushes(wiimotes.length-1)
 
-
             addStaticBall()
 
-
-            //playBoing(1);
-            //sound.play('boing')
+             document.getElementById("profile-c").style.display = "none";
 
 
             if(wiimotes.length >= 4) {
              document.getElementById("request-hid-device").style.display = "none";  
             }
 
-            //window.wiimote = wiimotes[0];
-
-            //console.log("devices array:", devices)
-            //console.log("device", device)
-            
-            //document.getElementById("buttons").style.display = "none";
             loadingEl.style.display = "none";
 
         } catch (error) {
@@ -895,18 +1014,117 @@ function initController() {
 
             console.log(`HID: ${device.productName}`);
 
-            setTimeout(() => {
-
-                // mC.removeChild(tempGUI)
-                // mC.removeChild(tempLOGO)
+                setTimeout(() => {
 
                 enableControls()
             }, 200);
 
         }
+
     }
 
+    //document.getElementById("profile-c").style.display = "none";
+
+    $('#profile-avatar').on('click', function (e) {
+
+      e.preventDefault();
+      var new_emoji = emojis.rand.give();
+      user_data.emoji = new_emoji.emoji;
+      user_data.bio = new_emoji.name;
+      
+      // document.getElementById('profile-b').innerHTML = user_data.emoji;
+      
+      document.getElementById('profile-avatar').innerHTML = user_data.emoji;
+      document.getElementById('ta-bio').innerHTML = user_data.bio;
+
+      user_data.nickname = $('#ta-nickname').val();
+      dataKeys.data(JSON.stringify(user_data));
+      //document.getElementById('profile-b').innerHTML = user_data.emoji;  
+
+    });
+
+
+    initController();
+
+
+}
+w.userConfig = userConfig;
+
+    
+
+
+function initController() {
+
+    console.log("initController")
+
+    var buttonsW = document.getElementById("buttonsW")
+    var conBut = document.createElement("button");
+    
+
+    conBut.innerText = "+ "+(wiimotes.length+1);
+    conBut.className = "bu";
+    conBut.id = "request-hid-device";
+
     buttonsW.appendChild(conBut)
+
+    conBut.onclick = function() {
+
+         document.getElementById("profile-c").style.display = "block";
+
+    }
+
+     // Note this is a function
+    //     // controller.newDevice(pop, _connected)
+
+    //     try {
+
+    //         const devices = await navigator.hid.requestDevice({
+    //             filters: [{ vendorId: 0x057e }],
+    //         });
+
+    //         device = devices[0];
+            
+    //         const wiimote = new WIIMote(device)
+
+    //         wiimotes.push(wiimote);
+
+    //         conBut.innerText = "+ "+(wiimotes.length+1);
+
+    //         addHUD(wiimotes.length-1)
+
+    //         addBrushes(wiimotes.length-1)
+
+
+    //         addStaticBall()
+
+
+    //         if(wiimotes.length >= 4) {
+    //          document.getElementById("request-hid-device").style.display = "none";  
+    //         }
+
+    //         loadingEl.style.display = "none";
+
+    //     } catch (error) {
+    //         console.log("An error occurred.", error);
+
+    //     }
+
+    //     if (!device) {
+    //         console.log("No device was selected.");
+
+    //     } else {
+
+    //         console.log(`HID: ${device.productName}`);
+
+    //             setTimeout(() => {
+
+    //             enableControls()
+    //         }, 200);
+
+    //     }
+    // }
+
+    // buttonsW.appendChild(conBut)
 
 
     /*    window.navigator.hid.addEventListener('connect', ({device}) => {
@@ -1096,9 +1314,29 @@ function addBrushes(id) {
     let n = id+1;
 
     // brush with a number
-    const r = new PIXI.Sprite.from("./assets/brushes/vBrush-"+n+".png"); //Sprite.from(textures[5])
+
+    // add container + text
+    let d = wiimotes[id].data;
+    let user = d.emoji +" "+d.nickname;
+    const text = new PIXI.Text(""+user+"", {fontSize: 38, fontFamily: "DIN Condensed", align: "right", fill:"white"});
+    text.x = 60;
+    text.y = -10;
+    text.name = "user"+id;
+    // let nx = wapp.W/2 - r.width/2;
+    // let ny = 150+id*(fontSize+fY)
+    // r.position.x = nx;
+
+
+    const r = new PIXI.Container();
+
+    const im = new PIXI.Sprite.from("./assets/brushes/vBrush-"+n+".png"); //Sprite.from(textures[5])
     r.zIndex = 1000000+id;
     r.name = "vBrush"+id;
+
+    r.addChild(im);
+    r.addChild(text);
+
+
 
     vBrushes.push(r)
 
@@ -1107,7 +1345,7 @@ function addBrushes(id) {
     let sr = new PIXI.Sprite(textures[0]);
 
     sr.zIndex = 5000+id;
-    sr.scale.set(scale1 * 0.9)
+    sr.scale.set(scale1 * 0.6)
     sr.anchor.set(0.5)
     sr.minScale = 0.1;
     sr.maxScale = 2;
@@ -1157,12 +1395,23 @@ function addHUD(id) {
         let fontSize = 88; 
         let fY = fontSize*0.2;
         let n = parseInt(id)+1;
-        let r = new PIXI.Text("Player "+n+" JOINED!", {fontSize: fontSize, fontFamily: "DIN Condensed", align: "right", fill:color});
-        r.position.x = wapp.W/2 - r.width/2;
-        r.position.y = 150+id*(fontSize+fY);
+
+        let d = wiimotes[id].data;
+        let user = d.emoji +" "+d.nickname;
+
+        let r = new PIXI.Text(""+user+" JOIN!", {fontSize: fontSize, fontFamily: "DIN Condensed", align: "right", fill:color});
+        let nx = wapp.W/2 - r.width/2;
+        let ny = 150+id*(fontSize+fY)
+        r.position.x = nx;
+        //r.position.y = 150+id*(fontSize+fY);
         r.name = "R"+id
 
         mC.addChild(r);    
+
+
+        gsap.fromTo(r, 0.75, {y:wapp.H+r.height}, {y: ny, duration: 3.5, ease: "elastic.out(1, 0.8)", onComplete:function() {
+            r.alpha = 0.25;
+        }});
 
 
         sound.play('joined');
@@ -1439,119 +1688,6 @@ function initPixi() {
         mC.addChild(selectedToolGraphic)
     }
 
-    function resetEditTool() {
-
-        console.log("resetEditTool")
-
-        editToolSelection = null
-        canvasItems.map((x) => {
-            x.alpha = 1
-            x.interactive = false
-            x.removeAllListeners();
-        })
-    }
-
-    function loadTools() {
-
-        console.log("loadTools")
-
-        // const graphics = new Graphics();
-        // graphics.beginFill(cols_grey);
-        // graphics.drawRect(0, 0, 80, wapp.H);
-        // graphics.endFill();
-
-        // graphics.zIndex = 10
-
-        // //mC.addChild(graphics)
-
-
-        // paintTool = new Text("Paint", { fontFamily: 'Arial', fontSize: 24, fill: 0xffffff, align: 'center' })
-        // paintTool.x = 12
-        // paintTool.y = 25
-        // paintTool.interactive = true
-        // paintTool.zIndex = 11
-
-
-        // paintTool.on("pointertap", () => {
-
-        //     _toolSelect("paint", 0, 0)
-        //     resetEditTool()
-        // })
-
-        //mC.addChild(paintTool)
-
-
-        // const editTool = new Text("Edit", { fontFamily: 'Arial', fontSize: 24, fill: 0xffffff, align: 'center' })
-        // editTool.x = 18
-        // editTool.y = 25 * 4
-        // editTool.interactive = true
-        // editTool.zIndex = 11
-
-
-        // editTool.on("pointertap", () => {
-
-        //     _toolSelect("edit", 0, 75)
-
-        //     console.log("editTool.on pointertap");
-
-
-        //     canvasItems.forEach(item => {
-
-        //         item.interactive = true
-        //         item.alpha = 0.2
-
-        //         item.on("pointertap", () => {
-
-        //             canvasItems.map(x => x.alpha = 0.2)
-
-        //             // if(editToolSelection != null){
-        //             //     editToolSelection.removeAllListeners();
-        //             // }
-
-        //             editToolSelection = item;
-        //             item.alpha = 1
-
-        //             item
-        //                 .on('mousedown', (event) => {
-        //                     if (editToolSelection == item) {
-        //                         editToolSelectionData = vBrushes[0]
-        //                     }
-        //                 })
-
-        //                 .on('touchstart', (event) => {
-
-        //                 })
-
-        //                 .on('mouseup', onDragEnd)
-        //                 .on('mouseupoutside', onDragEnd)
-        //                 .on('touchend', onDragEnd)
-        //                 .on('touchendoutside', onDragEnd)
-
-        //                 .on('mousemove', onDragMove)
-
-        //                 .on('touchmove', onDragMove);
-
-
-        //         })
-        //     });
-        // })
-
-        //mC.addChild(editTool)
-
-
-    }
-
-
-    function onDragEnd() {
-        editToolSelectionData = null
-    }
-
-    function onDragMove() {
-        if (editToolSelectionData != null) {
-            editToolSelection.x = editToolSelectionData.x
-            editToolSelection.y = editToolSelectionData.y
-        }
-    }
 
     function loadTextures() {
 
@@ -1587,7 +1723,6 @@ function initPixi() {
     }
 
 
-    loadTools()
 
     loadTextures()
 
@@ -1727,12 +1862,13 @@ function initPixi() {
 
 
 
-    initController();
+    //initController();
 
 
 
 
 }
+w.initController = initController;
 
 
 function setupGamesMenu() {
@@ -1906,6 +2042,7 @@ function addPoints(id,p) {
 
     //ptxt.text = ""+n+": "+wiimotes[id].points+"";
     ptxt.text = ""+wiimotes[id].points+"";
+    ptxt.alpha = 1;
 
     //bounce(sBrushes[id])
 
@@ -1969,6 +2106,8 @@ function setupStage() {
 
 
     initPixi();
+
+    userConfig();
 
 
 }
