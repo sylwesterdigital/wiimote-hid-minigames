@@ -933,10 +933,10 @@ function setTmpUserData(id) {
         //dataKeys.data(JSON.stringify(tmp_user_data));
 
         tmp_user_data.id = 'Anon' + Math.random() * 1000;
-        tmp_user_data.emoji = document.getElementById('profile-avatar').value;
+        tmp_user_data.emoji = document.getElementById('profile-avatar').innerHTML;
         tmp_user_data.uid = create_UUID();
         tmp_user_data.nickname = document.getElementById('ta-nickname').value;
-        tmp_user_data.bio = document.getElementById('ta-bio').innerHTML;
+        tmp_user_data.bio = document.getElementById('ta-bio').value;
         tmp_user_data.attachment = '';
         tmp_user_data.points = 0;
         tmp_user_data.games = {};
