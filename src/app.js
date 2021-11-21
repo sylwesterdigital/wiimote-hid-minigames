@@ -135,20 +135,6 @@ w.sound = sound
 
 /* P5 experiment */
 
-function updateUserScore(owner) {
-
-    if(owner) {
-
-        var val = parseFloat(String(owner).substr(5,3));
-        wiimotes[val].data.score += 10;
-        let d = wiimotes[val].data;
-        let user = d.emoji +" "+d.nickname;
-        let score = parseInt(d.score);
-        app.stage.getChildByName("mC").getChildByName("vBrush"+val).children[1].text = ""+user+": +"+score;
-    }
-
-}
-
 
 
 class Ball {
@@ -191,10 +177,10 @@ class Ball {
 
             //console.log(distance);
           //console.log(minDist);
+
+
           if (distance < minDist) {
             //console.log("2",this.name,this.others[i].name);
-
-            
 
             let angle = Math.atan2(dy, dx);
             let targetX = this.x + Math.cos(angle) * minDist;
@@ -206,8 +192,8 @@ class Ball {
             this.others[i].vx += ax;
             this.others[i].vy += ay;
 
-            if(String(this.others[i].name).includes("wound")) {
 
+            if(String(this.others[i].name).includes("wound")) {
                 //console.log("KICK",this.name,'==>',this.others[i].name)
                 this.owner = this.others[i].name;
 
@@ -232,41 +218,31 @@ class Ball {
 
                 if(this.others[i].name == "post4") {
                     addPoints(3,-10)
-                }                                
+                }   
 
-                sound.play('hit1')
+                sound.play('hit1');
+
+                if(this.owner) {
+                    addUserPoints(this.owner)
+                }
+
                 this.hit = 1;
-                console.log("scored:",this.owner)
 
-                updateUserScore(this.owner)
-
-                //ptxt.text = ""+wiimotes[id].points+"";
-
-
+                //console.log("scored:",this.owner)
+                
+                //ptxt.text = ""+wiimotes[id].data.points+"";
             }
 
 
           }
-
-
-
-
-
-
-
         }
 
 
-//    }
+
+    }
 
 
 
-
-
-
-
-
-  }
 
   move() {
 
@@ -367,7 +343,7 @@ class Ball {
 let balls = [];
 let barticles = [];
 
-let numBalls = 20;
+let numBalls = 40;
 let spring = 0.2;
 let gravity = 0.2;
 let friction = -0.1;
@@ -663,7 +639,8 @@ function enableControls() {
 
 
     wiimotes[wiiN].id = wiiN;
-    wiimotes[wiiN].points = 0;
+
+    //wiimotes[wiiN].data.points = 0;
 
     wiimotes[wiiN].BtnListener = (buttons,myID) => {
 
@@ -893,102 +870,152 @@ function create_UUID() {
 }
 
 var localStorage = window.localStorage;
-var dataKeys = {
-    data: function(val) {
-        return (typeof(val) === 'undefined' ? localStorage.userData : localStorage.userData = val);
-    }
-}
+// var dataKeys = {
+//     data: function(val) {
+//         return (typeof(val) === 'undefined' ? localStorage.userData : localStorage.userData = val);
+//     }
+// }
 
-var user_data = {};
+
 var players_data = []
 w.players_data = players_data;
 
 
+// tmp_user_data.id = '';
+// tmp_user_data.emoji = '';
+// tmp_user_data.uid = create_UUID();
+// tmp_user_data.nickname = '';
+// tmp_user_data.bio = ""
+// tmp_user_data.attachment = '';
+// tmp_user_data.points = 0;
+// tmp_user_data.games = {};
+
+
 //var players = []
 
-if (!dataKeys.data()) {
+// if (!dataKeys.data()) {
   
-    user_data.id = 'Anon' + Math.random() * 1000;
-    user_data.emoji = emojis.rand.give().emoji;
-    user_data.uid = create_UUID();
-    user_data.nickname = 'Anon';
-    user_data.bio = "I'm nobody."
-    user_data.attachment = '';
-    user_data.score = 0;
-    user_data.games = {};
+//     tmp_user_data.id = 'Anon' + Math.random() * 1000;
+//     tmp_user_data.emoji = emojis.rand.give().emoji;
+//     tmp_user_data.uid = create_UUID();
+//     tmp_user_data.nickname = 'Anon';
+//     tmp_user_data.bio = "I'm nobody."
+//     tmp_user_data.attachment = '';
+//     tmp_user_data.points = 0;
+//     tmp_user_data.games = {};
 
-    dataKeys.data(JSON.stringify(user_data));
+//     dataKeys.data(JSON.stringify(tmp_user_data));
   
-    // document.getElementById('profile-b').innerHTML = user_data.emoji;
-    // document.getElementById('profile-avatar').innerHTML = user_data.emoji;
-    // document.getElementById('ta-nickname').innerHTML = user_data.nickname;
-    // document.getElementById('ta-bio').innerHTML = user_data.bio;  
+//     // document.getElementById('profile-b').innerHTML = tmp_user_data.emoji;
+//     // document.getElementById('profile-avatar').innerHTML = tmp_user_data.emoji;
+//     // document.getElementById('ta-nickname').innerHTML = tmp_user_data.nickname;
+//     // document.getElementById('ta-bio').innerHTML = tmp_user_data.bio;  
 
-} else {
+// } else {
 
-    user_data = JSON.parse(dataKeys.data());
-    console.log('chat_id:', user_data.id)
-    // document.getElementById('profile-b').innerHTML = user_data.emoji;
-    // document.getElementById('profile-avatar').innerHTML = user_data.emoji;
-    // document.getElementById('ta-nickname').innerHTML = user_data.nickname;
-    // document.getElementById('ta-bio').innerHTML = user_data.bio;  
+//     tmp_user_data = JSON.parse(dataKeys.data());
+//     console.log('chat_id:', tmp_user_data.id)
+//     // document.getElementById('profile-b').innerHTML = tmp_user_data.emoji;
+//     // document.getElementById('profile-avatar').innerHTML = tmp_user_data.emoji;
+//     // document.getElementById('ta-nickname').innerHTML = tmp_user_data.nickname;
+//     // document.getElementById('ta-bio').innerHTML = tmp_user_data.bio;  
+// }
+
+//w.tmp_user_data = tmp_user_data;
+
+
+function setTmpUserData(id) {
+
+        console.log("setTmpUserData - wiimotes.length - ", wiimotes.length)
+
+        let tmp_user_data = {};
+        
+        //dataKeys.data(JSON.stringify(tmp_user_data));
+
+        tmp_user_data.id = 'Anon' + Math.random() * 1000;
+        tmp_user_data.emoji = document.getElementById('profile-avatar').value;
+        tmp_user_data.uid = create_UUID();
+        tmp_user_data.nickname = document.getElementById('ta-nickname').value;
+        tmp_user_data.bio = document.getElementById('ta-bio').innerHTML;
+        tmp_user_data.attachment = '';
+        tmp_user_data.points = 0;
+        tmp_user_data.games = {};
+
+        players_data.push(tmp_user_data)
+
+        console.log(" tmp_user_data >>>>>> 1",tmp_user_data);
+
+        wiimotes[id].data = tmp_user_data;
+
+        console.log(" wiimotes[id].data >>>>>> 1",wiimotes[id].data);
+
 }
-
-w.user_data = user_data;
-
 
 
 
 
 function userConfig() {
 
+
+    console.log("userConfig");
+
     /* Avatar / Profile */
 
 
-    $('#profile-b').on('click', function (e) {
-        e.preventDefault();
-        document.getElementById("profile-c").style.display = "block";
-        //document.getElementById("profile-b").style.display = "none";
+    // $('#profile-b').on('click', function (e) {
+
+    //     e.preventDefault();
+    //     document.getElementById("profile-c").style.display = "block";
+    //     //document.getElementById("profile-b").style.display = "none";
       
-        $('#ta-nickname').height(53);
-        $('#ta-bio').height(53);
+    //     $('#ta-nickname').height(53);
+    //     $('#ta-bio').height(53);
        
-    });
+    // });
 
     document.getElementById("profile-save-b").onclick = async function(e) {
 
         e.preventDefault();
 
-        user_data.nickname = $('#ta-nickname').val().replace(/(\r\n|\n|\r)/gm, " ");
-        user_data.bio = $('#ta-bio').val().replace(/(\r\n|\n|\r)/gm, "");
+        // tmp_user_data.nickname = $('#ta-nickname').val().replace(/(\r\n|\n|\r)/gm, " ");
+        // tmp_user_data.bio = $('#ta-bio').val().replace(/(\r\n|\n|\r)/gm, "");
         
-        dataKeys.data(JSON.stringify(user_data));
+        // //dataKeys.data(JSON.stringify(tmp_user_data));
 
-        players_data.push(user_data);
+        // tmp_user_data.id = 'Anon' + Math.random() * 1000;
+        // tmp_user_data.emoji = document.getElementById('profile-avatar').innerHTML;
+        // tmp_user_data.uid = create_UUID();
+        // tmp_user_data.nickname = document.getElementById('ta-nickname').innerHTML;
+        // tmp_user_data.bio = document.getElementById('ta-bio').innerHTML;
+        // tmp_user_data.attachment = '';
+        // tmp_user_data.points = 0;
+        // tmp_user_data.games = {};
 
-
-        // //console.log(user_data)
-        // //dataKeys.data(JSON.stringify(user_data));
+        // //console.log(tmp_user_data)
+        // //dataKeys.data(JSON.stringify(tmp_user_data));
         // document.getElementById("profile-c").style.display = "none";
         // //document.getElementById("profile-b").style.display = "block";
 
         try {
+
 
             const devices = await navigator.hid.requestDevice({
                 filters: [{ vendorId: 0x057e }],
             });
 
             device = devices[0];
-            
             const wiimote = new WIIMote(device)
-
             wiimotes.push(wiimote);
-            wiimotes[wiimotes.length-1].data = players_data[wiimotes.length-1]
+
+
+            //players_data.push(tmp_user_data);
+            //console.log(wiimotes[wiimotes.length-1].data);
 
             document.getElementById("request-hid-device").innerText = "+ "+(wiimotes.length+1);
 
-            addHUD(wiimotes.length-1)
 
+            setTmpUserData(wiimotes.length-1)
+            addHUD(wiimotes.length-1)
             addBrushes(wiimotes.length-1)
 
             addStaticBall()
@@ -1028,18 +1055,15 @@ function userConfig() {
     $('#profile-avatar').on('click', function (e) {
 
       e.preventDefault();
-      var new_emoji = emojis.rand.give();
-      user_data.emoji = new_emoji.emoji;
-      user_data.bio = new_emoji.name;
-      
-      // document.getElementById('profile-b').innerHTML = user_data.emoji;
-      
-      document.getElementById('profile-avatar').innerHTML = user_data.emoji;
-      document.getElementById('ta-bio').innerHTML = user_data.bio;
 
-      user_data.nickname = $('#ta-nickname').val();
-      dataKeys.data(JSON.stringify(user_data));
-      //document.getElementById('profile-b').innerHTML = user_data.emoji;  
+      var new_emoji = emojis.rand.give();
+      
+      document.getElementById('profile-avatar').innerHTML = new_emoji.emoji;
+      document.getElementById('ta-bio').innerHTML = new_emoji.name;
+
+      //tmp_user_data.nickname = $('#ta-nickname').val();
+      //dataKeys.data(JSON.stringify(tmp_user_data));
+      //document.getElementById('profile-b').innerHTML = tmp_user_data.emoji;  
 
     });
 
@@ -1318,10 +1342,18 @@ function addBrushes(id) {
     // add container + text
     let d = wiimotes[id].data;
     let user = d.emoji +" "+d.nickname;
-    const text = new PIXI.Text(""+user+"", {fontSize: 38, fontFamily: "DIN Condensed", align: "right", fill:"white"});
-    text.x = 60;
-    text.y = -10;
-    text.name = "user"+id;
+    const textUsername = new PIXI.Text(""+user+"", {fontSize: 38, fontFamily: "DIN Condensed", align: "right", fill:"white"});
+    textUsername.x = 60;
+    textUsername.y = -10;
+    textUsername.name = "user"+id;
+
+
+    const textPoints = new PIXI.Text(""+d.points+"", {fontSize: 56, fontFamily: "DIN Condensed", align: "left", fill:"yellow"});
+    textPoints.x = 60;
+    textPoints.y = 30;
+    textPoints.name = "points"+id;
+
+
     // let nx = wapp.W/2 - r.width/2;
     // let ny = 150+id*(fontSize+fY)
     // r.position.x = nx;
@@ -1334,7 +1366,8 @@ function addBrushes(id) {
     r.name = "vBrush"+id;
 
     r.addChild(im);
-    r.addChild(text);
+    r.addChild(textUsername);
+    r.addChild(textPoints);
 
 
 
@@ -1812,7 +1845,10 @@ function initPixi() {
                     particles.splice(particles.findIndex( item => item.name === p.name ),1)
 
                     let points = Math.floor(Math.abs(p.speedX*p.speedY*10));
-                    addPoints(g,points)
+
+                    
+                    //addPoints(g,points)
+                    
                     document.getElementById("game-msg").innerHTML = "particles: "+particles.length;
 
                     //speedY = - (speedY+2);
@@ -1871,34 +1907,12 @@ function initPixi() {
 w.initController = initController;
 
 
-function setupGamesMenu() {
-
-    // show menu
-
-
-    
-}
-
-w.setupGamesMenu = setupGamesMenu;
-
-
-
-
-
 function resizeGame() {
-
-    console.log("resizeGame: >", $(window).width())
-
+    //console.log("resizeGame: >", $(window).width())
     wapp.W = $(window).width();
     wapp.H = $(window).height();
-
     document.getElementById("IRdebug").innerHTML = wapp.W + " x " + wapp.H;
-
     app.resize(wapp.W, wapp.H);
-
-
-
-
 }
 
 window.textures = textures;
@@ -1906,29 +1920,17 @@ window.textures = textures;
 
 
 function addSprites(resources) {
-
     console.log("addSprites")
-
     Object.keys(resources).forEach(key => {
         //console.log(resources[key]);
-        
         //console.log('addSprites:', key)
-
         if(resources[key].texture) {
             textures.push(resources[key].texture)
         }
-
     });
-
     setupStage()
 }
 
-
-function parsingMiddleware() {
-
-    console.log("parsingMiddleware");
-
-}
 
 
 function loadAssets() {
@@ -1981,83 +1983,57 @@ function loadAssets() {
 
 }
 
-
-/*function loadAssets() {
-
-    console.log("loadAssets"); 
+function addUserPoints(owner) {
 
 
-    const loader = Loader.shared; 
+    console.log("owner", owner)
 
-    for (let index = 1; index <= 17; index++) {
-        const strI = (index < 10) ? "0" + index : index + '';
-        let strName = 'shape'+strI
-        console.log("strName:", strName)
+    var id = parseFloat(String(owner).substr(5,3));
+    
+    //let d = wiimotes[id].data;
 
-        //loader.add(strName, './assets/shapes/basis/'+strI+'.basis')
-        loader.add(strName, './assets/shapes/png-tiny/'+strI+'.png')
-    }
-
-    loader.load((loader, resources) => {})
+    console.log('id',id) 
 
 
-    //loader.use(parsingMiddleware)
+    // let user = d.emoji +" "+d.nickname;
+    // let points = parseInt(d.points);
 
-    loader.onProgress.add(() => {
-        console.log("loading...")
-    }); // called once per loaded/errored file
+    // app.stage.getChildByName("mC").getChildByName("vBrush"+id).children[1].text = ""+user+": +"+points;    
 
-    loader.onError.add(() => {
-        console.log("Error loading...")
-    }); // called once per errored file
-
-    loader.onLoad.add(() => {
-        console.log("- loaded")        
-    }); // called once per loaded file    
-
-    loader.onComplete.add(() => {
-        console.log("onComplete");
-        const resources             = loader.resources;
-        addSprites(resources);
-    });
-
-
-}*/
-
-
-/*function addVBrush(n) {
-    const vBrush1 = new PIXI.Sprite.from("./assets/brushes/vBrush-"+n+".png"); //Sprite.from(textures[5])
-    vBrush1.zIndex = 1000000+n;
-    vBrush1.name = "vBrush"+n
-
-    vBrushes.push()
 }
-*/
+
+
 
 function addPoints(id,p) {
 
     let n = parseInt(id)+1;
-    wiimotes[id].points +=p;
+    wiimotes[id].data.points +=p;
+
+    // goalPost text
     let ptxt = app.stage.getChildByName("mC").getChildByName("R"+id);
-
     //ptxt.text = ""+n+": "+wiimotes[id].points+"";
-    ptxt.text = ""+wiimotes[id].points+"";
+    ptxt.text = ""+wiimotes[id].data.points+"";
     ptxt.alpha = 1;
-
     //bounce(sBrushes[id])
-
     //bounce(ptxt)
     fadein(ptxt)
 
     sound.play('boing');
 
-
-    // position
-
+    // position of goalPost text the same goalPost;
     ptxt.x = app.stage.getChildByName("mC").getChildByName("goalPost"+id).x - ptxt.width/2;
     ptxt.y = app.stage.getChildByName("mC").getChildByName("goalPost"+id).y - ptxt.height/2;
+    
+    //var val = parseFloat(String(owner).substr(5,3));
+    // wiimotes[id].data.score += 10;
+    
+    // let d = wiimotes[id].data;
+    // let user = d.emoji +" "+d.nickname;
+    // let score = parseInt(d.score);
+    
+    // console.log('d',d)
 
-
+    // app.stage.getChildByName("mC").getChildByName("vBrush"+id).children[1].text = ""+user+": +"+score;
 
 }
 
