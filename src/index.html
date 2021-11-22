@@ -1,41 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title><%= htmlWebpackPlugin.options.title %></title>
-    <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">    
+    <title>
+        <%= htmlWebpackPlugin.options.title %>
+    </title>
+    <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
     <meta charset="utf-8">
 </head>
 
 <body>
 
-<div id="profile-c" style="display: none;">
-    <div id="profile-wrap">
-    
-     <p class="p-hint">Click to change</p> 
-       <div id="profile-avatar" class="no-sel">🐹</div>
-           
-      
-      <textarea id="ta-nickname" class="ta-profiles" name="nickname" placeholder="Nickname" cols="20" rows="1" maxlength="16" style="overflow-y: hidden; height: 53px;">Anon</textarea>
-      
-      <textarea id="ta-bio" class="ta-profiles" name="bio" placeholder="Bio" cols="20" rows="1" maxlength="24" style="overflow-y: hidden; height: 53px;"> Hamster Face</textarea>
-    <p class="p-hint">You sure? save your update!</p>
-    
-     <div class="round-b" id="profile-save-b">Save</div>            
-
-      
-      
-    </div>
-  </div>
-
-
-
-
-    <div id="buttons">
-        <div id="buttonsW">
+    <div id="profile-c" style="display: none;">
+        <div id="profile-wrap">
+            <p class="p-hint">Click to change</p>
+            <div id="profile-avatar" class="no-sel">🐹</div>
+            <textarea id="ta-nickname" class="ta-profiles" name="nickname" placeholder="Nickname" cols="20" rows="1" maxlength="16" style="overflow-y: hidden; height: 53px;">Anon</textarea>
+            <textarea id="ta-bio" class="ta-profiles" name="bio" placeholder="Bio" cols="20" rows="1" maxlength="24" style="overflow-y: hidden; height: 53px;"> Hamster Face</textarea>
+            <p class="p-hint">You sure? save your update!</p>
+            <div class="round-b" id="profile-save-b">Add Actor</div>
         </div>
     </div>
 
+
+    <div id="buttons">
+        <div id="buttonsW"></div>
+        <div class="bu" id="game-start-b"></div>        
+    </div>
+    
     <div id="gyro">
         <div id="accA"></div>
         <div id="accXYZ"></div>
@@ -45,13 +38,9 @@
     <div id="ir">
         <div id="IRdebug"></div>
     </div>
-
+    
     <div id="loading">
         <div id="loading-msg"></div>
-    </div>
-
-    <div id="game">
-        <div id="game-msg"></div>
     </div>
 
 

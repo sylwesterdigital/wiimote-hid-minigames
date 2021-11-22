@@ -121,7 +121,9 @@ const soundsData = {
     fail3: './assets/audio/fx/ohh3.mp3',
     fail4: './assets/audio/fx/ohh4.mp3',
     joined: './assets/audio/fx/Pickup_Coin2.wav',
-    boing: './assets/audio/fx/blip1.mp3'
+    boing: './assets/audio/fx/blip1.mp3',
+    gameover: './assets/audio/fx/Win1.wav',
+    start: './assets/audio/fx/Fine1.wav'    
 };
 
 // Add to the PIXI loader
@@ -202,35 +204,42 @@ class Ball {
 
             if(String(this.name).includes("ball") && String(this.others[i].name).includes("post")) {
 
-                console.log("BOOM",this.name,'==>',this.others[i].name)
+                //console.log("BOOM",this.name,this.owner,'==>',this.others[i].name)
 
-                if(this.others[i].name == "post1") {
-                    addPoints(0,-10)
+                if(game.playing == true) {
+
+
+                    if(this.others[i].name == "post1") {
+                        addPoints(0,-10)
+
+                    }
+                    if(this.others[i].name == "post2") {
+                        addPoints(1,-10)
+                    }
+
+                    if(this.others[i].name == "post3") {
+                        addPoints(2,-10)
+                    }
+
+                    if(this.others[i].name == "post4") {
+                        addPoints(3,-10)
+                    }   
+
+                    sound.play('hit1');
+
+                    if(this.owner) {
+                        addUserPoints(this.owner)
+                    }
+
+                    this.hit = 1;
+
+                    //console.log("scored:",this.owner)
+                    
+                    //ptxt.text = ""+wiimotes[id].data.points+"";
+
 
                 }
-                if(this.others[i].name == "post2") {
-                    addPoints(1,-10)
-                }
 
-                if(this.others[i].name == "post3") {
-                    addPoints(2,-10)
-                }
-
-                if(this.others[i].name == "post4") {
-                    addPoints(3,-10)
-                }   
-
-                sound.play('hit1');
-
-                if(this.owner) {
-                    addUserPoints(this.owner)
-                }
-
-                this.hit = 1;
-
-                //console.log("scored:",this.owner)
-                
-                //ptxt.text = ""+wiimotes[id].data.points+"";
             }
 
 
@@ -343,7 +352,7 @@ class Ball {
 let balls = [];
 let barticles = [];
 
-let numBalls = 40;
+let numBalls = 100;
 let spring = 0.2;
 let gravity = 0.2;
 let friction = -0.1;
@@ -405,7 +414,8 @@ var goalPosts = [];
 
 function addGoalPost() {
 
-    let pad = 20;
+    let pad = 15;
+    let offset = 150;
 
     // Circle + line style 1
     const c = new PIXI.Graphics();
@@ -417,6 +427,7 @@ function addGoalPost() {
 
     const tx = app.renderer.generateTexture(c);
     const spr = PIXI.Sprite.from(tx);
+
     spr.name = "goalPost"+goalPosts.length;
 
     spr.anchor.set(0.55)
@@ -425,20 +436,20 @@ function addGoalPost() {
 
 
     if(goalPosts.length == 1) {
-        spr.x = 150;
-        spr.y = 150;
+        spr.x = offset;
+        spr.y = offset;
     }
     if(goalPosts.length == 2) {
         spr.x = wapp.W - pad - spr.width;
-        spr.y = 150;
+        spr.y = offset;
     }
     if(goalPosts.length == 3) {
         spr.x = 350;
-        spr.y = 150;
+        spr.y = offset;
     }
     if(goalPosts.length == 4) {
         spr.x = wapp.W - pad - spr.width - 200;
-        spr.y = 150;
+        spr.y = offset;
     }        
 
 /*    if(goalPosts.length == 3) {
@@ -449,6 +460,8 @@ function addGoalPost() {
         spr.x = wapp.W - pad - spr.width;
         spr.y = wapp.H - 250;
     }*/
+
+    console.log("goalPosts.length",goalPosts.length)
     
     balls[balls.length] = new Ball(
 
@@ -475,12 +488,24 @@ w.addGoalPost = addGoalPost;
 w.goalPosts = goalPosts;
 
 
+function resetBalls() {
+    for(var e in balls) {
+        let r = balls[e];
+        if(String(r.name).includes("ball")) {
+            r.x = wapp.W*0.33 + (Math.random()*wapp.W)*0.33;
+            r.y = 0.65*(Math.random()*wapp.H) + wapp.H*0.35;
+        }
+    } 
+}
+w.resetBalls = resetBalls;
+
 
 function addStaticBall() {
 
     let i = balls.length;
     let wi = String(wiimotes.length-1);
-    //console.log(wi)
+    
+    console.log("addStaticBall",wi)
 
     balls[i] = new Ball(
 
@@ -492,47 +517,36 @@ function addStaticBall() {
       width,
       height,
       "wound"+wi
-
     );
 
+    //let tx = textures[Math.floor(Math.random() * textures.length)]
+    const p = new PIXI.Sprite.from("./assets/Samsung_Internet_logo.png");
+    
+    let s1 = 0.22;//Math.random()*0.1+ 0.01;
+    
+    p.scale.set(s1,s1);
+    
+    p.name = "wound"+wiimotes.length-1;
+    
+    // p.angle = Math.random()*5;
+    // p.angleSpeed = Math.random()*2 - Math.random()*2;
 
+    p.anchor.set(0.5)
+    // p.x = -p.width - Math.random()*300
+    // p.y = Math.floor(Math.random() * (app.screen.height - 150)) + 50;
+    // p.speedX = Math.random()*2 + 0.2;
+    // p.speedY = Math.random()*0.5 - Math.random()*0.5;
+    
+    //p.zIndex = 1;
+    
+    //p.x = balls[i].x
+    //p.y = balls[i].y
 
+    //console.log(p.x,p.y)
 
-        //let tx = textures[Math.floor(Math.random() * textures.length)]
+    mC.addChild(p);
 
-        const p = new PIXI.Sprite.from("./assets/Samsung_Internet_logo.png");
-        
-        let s1 = 0.22;//Math.random()*0.1+ 0.01;
-        
-        p.scale.set(s1,s1);
-        
-        p.name = "wound"+wiimotes.length-1;
-        
-
-        // p.angle = Math.random()*5;
-        // p.angleSpeed = Math.random()*2 - Math.random()*2;
-
-        p.anchor.set(0.5)
-        // p.x = -p.width - Math.random()*300
-        // p.y = Math.floor(Math.random() * (app.screen.height - 150)) + 50;
-        // p.speedX = Math.random()*2 + 0.2;
-        // p.speedY = Math.random()*0.5 - Math.random()*0.5;
-        
-        //p.zIndex = 1;
-        
-        
-
-        //p.x = balls[i].x
-        //p.y = balls[i].y
-
-
-        //console.log(p.x,p.y)
-
-
-        mC.addChild(p);
-
-        barticles.push(p)
-
+    barticles.push(p)
 
 
 }
@@ -837,20 +851,116 @@ var emojis = ['🙈 See-No-Evil Monkey','🙉 Hear-No-Evil Monkey','🙊 Speak-N
 
 emojis.rand = {
     give: function() {
-        var rs = Math.floor(Math.random()*emojis.length-1);
-        var em = emojis[rs];
-        var emoji = em.split(' ')[0];
-        var name = em.substr(2,em.length);
+        let rs = Math.floor(Math.random()*emojis.length-1);
+        let em = emojis[rs];
+        let emoji = em.split(' ')[0];
+        console.log(emoji, rs);
+        let name = em.substr(2,em.length);
         return {emoji:emoji,name:name,pos:rs};
     },
     get: function(num) {
-        var em = emojis[num];
-        var emoji = em.split(' ')[0];
-        var name = em.substr(2,em.length);
+        let em = emojis[num];
+        console.log(em, emojis[num]);
+        let emoji = em.split(' ')[0];
+        let name = em.substr(2,em.length);
         return {emoji:emoji,name:name,pos:num};     
     }
     
 }
+
+
+/* 
+    Countdown 
+    ---------------
+
+                        */
+
+
+let game = {}
+game.playing = false;
+
+
+var countdown = {
+
+    start: function(time) {
+        resetBalls();
+        let r = app.stage.getChildByName("mC").getChildByName("Countdown");
+        r.text = "GO GO GO!";
+
+        let nx = wapp.W/2 - r.width/2;
+        let ny  = wapp.H/2 - r.height/2;
+        gsap.fromTo(r, 1.5, {x:nx, y:-r.height}, {x:nx, y: ny, duration: 3.5, ease: "elastic.out(1, 0.8)"}); 
+
+        r.alpha = 1; 
+        fadein(r)
+        this.left = time;
+        sound.play('start');
+        this.id = setInterval(this.display, 1000)
+        game.playing = true;
+    },
+
+    display: function() {
+        let r =  countdown
+        r.left -= 1;
+        let str = new Date(r.left * 1000).toISOString().substr(11, 8)
+        let g = app.stage.getChildByName("mC").getChildByName("Countdown")
+        g.text = str;
+        g.alpha = 0.05;    
+
+        if(r.left <= 0) {
+            let f = app.stage.getChildByName("mC").getChildByName("Countdown");
+            f.text = "GAME OVER";
+            let nx = wapp.W/2 - f.width/2;
+            let ny  = wapp.H/2 - f.height/2;
+            gsap.fromTo(f, 1.5, {x:nx, y:-f.height}, {x:nx, y: ny, duration: 3.5, ease: "elastic.out(1, 0.8)"});
+            f.alpha = 1;            
+            sound.play('gameover');
+            r.stop();
+
+
+            setTimeout(startAgain, 5000)
+
+        }
+        //console.log('tick', r.left);
+    },
+
+    stop: function() {
+        game.playing = false;
+        console.log("countdown.stop")
+        clearInterval(this.id);
+        let r = app.stage.getChildByName("mC").getChildByName("Countdown");
+        fadein(r);
+        document.getElementById("buttons").style.display = "block";
+        resetBalls()
+    },
+
+    create: function(t,c) {
+        if(!app.stage.getChildByName("mC").getChildByName("Countdown")) {
+            let fontSize = 140;
+            const txt = new PIXI.Text(t, {fontSize: fontSize, fontFamily: "DIN Condensed", align: "center", fill:"white"});
+            txt.name = "Countdown"
+            txt.alpha = 0.2;
+            c.addChild(txt);
+            let nx = wapp.W/2 - txt.width/2;
+            let ny  = wapp.H - txt.height - fontSize;
+            gsap.fromTo(txt, 1.5, {x:nx, y:wapp.H+txt.height}, {x:nx, y: ny, duration: 3.5, ease: "elastic.out(1, 0.8)"})
+        }
+            this.init();
+        //barticles.push(txt)
+    },
+
+    init: function() {
+        console.log("countdown.init")
+        this.id = "countdownID";
+        this.limit = 30;
+        this.key = 0;
+        this.left = 0;        
+    }
+}
+w.countdown = countdown;
+
+
+
 
 
 /* 
@@ -869,7 +979,7 @@ function create_UUID() {
     return uuid;
 }
 
-var localStorage = window.localStorage;
+// var localStorage = window.localStorage;
 // var dataKeys = {
 //     data: function(val) {
 //         return (typeof(val) === 'undefined' ? localStorage.userData : localStorage.userData = val);
@@ -880,56 +990,11 @@ var localStorage = window.localStorage;
 var players_data = []
 w.players_data = players_data;
 
-
-// tmp_user_data.id = '';
-// tmp_user_data.emoji = '';
-// tmp_user_data.uid = create_UUID();
-// tmp_user_data.nickname = '';
-// tmp_user_data.bio = ""
-// tmp_user_data.attachment = '';
-// tmp_user_data.points = 0;
-// tmp_user_data.games = {};
-
-
-//var players = []
-
-// if (!dataKeys.data()) {
-  
-//     tmp_user_data.id = 'Anon' + Math.random() * 1000;
-//     tmp_user_data.emoji = emojis.rand.give().emoji;
-//     tmp_user_data.uid = create_UUID();
-//     tmp_user_data.nickname = 'Anon';
-//     tmp_user_data.bio = "I'm nobody."
-//     tmp_user_data.attachment = '';
-//     tmp_user_data.points = 0;
-//     tmp_user_data.games = {};
-
-//     dataKeys.data(JSON.stringify(tmp_user_data));
-  
-//     // document.getElementById('profile-b').innerHTML = tmp_user_data.emoji;
-//     // document.getElementById('profile-avatar').innerHTML = tmp_user_data.emoji;
-//     // document.getElementById('ta-nickname').innerHTML = tmp_user_data.nickname;
-//     // document.getElementById('ta-bio').innerHTML = tmp_user_data.bio;  
-
-// } else {
-
-//     tmp_user_data = JSON.parse(dataKeys.data());
-//     console.log('chat_id:', tmp_user_data.id)
-//     // document.getElementById('profile-b').innerHTML = tmp_user_data.emoji;
-//     // document.getElementById('profile-avatar').innerHTML = tmp_user_data.emoji;
-//     // document.getElementById('ta-nickname').innerHTML = tmp_user_data.nickname;
-//     // document.getElementById('ta-bio').innerHTML = tmp_user_data.bio;  
-// }
-
-//w.tmp_user_data = tmp_user_data;
-
-
 function setTmpUserData(id) {
 
         console.log("setTmpUserData - wiimotes.length - ", wiimotes.length)
 
-        let tmp_user_data = {};
-        
+        let tmp_user_data = {};        
         //dataKeys.data(JSON.stringify(tmp_user_data));
 
         tmp_user_data.id = 'Anon' + Math.random() * 1000;
@@ -942,59 +1007,50 @@ function setTmpUserData(id) {
         tmp_user_data.games = {};
 
         players_data.push(tmp_user_data)
-
-        console.log(" tmp_user_data >>>>>> 1",tmp_user_data);
+        //console.log(" tmp_user_data >>>>>> 1",tmp_user_data);
 
         wiimotes[id].data = tmp_user_data;
-
-        console.log(" wiimotes[id].data >>>>>> 1",wiimotes[id].data);
+        //console.log(" wiimotes[id].data >>>>>> 1",wiimotes[id].data);
 
 }
 
 
+function startAgain() {
 
+        console.log("start game");
+
+        max_wiimotes = wiimotes.length;
+
+        countdown.create('00:00:00', app.stage.getChildByName("mC"))
+
+        countdown.start(10)
+
+        document.getElementById("buttons").style.display = "none";
+}
+
+
+
+let max_wiimotes = 4;
 
 function userConfig() {
 
 
     console.log("userConfig");
 
-    /* Avatar / Profile */
+    document.getElementById("game-start-b").innerHTML = "START"
 
 
-    // $('#profile-b').on('click', function (e) {
+     document.getElementById("game-start-b").onclick = function() {
 
-    //     e.preventDefault();
-    //     document.getElementById("profile-c").style.display = "block";
-    //     //document.getElementById("profile-b").style.display = "none";
-      
-    //     $('#ta-nickname').height(53);
-    //     $('#ta-bio').height(53);
-       
-    // });
+        startAgain();
+
+     }
+
+
 
     document.getElementById("profile-save-b").onclick = async function(e) {
 
         e.preventDefault();
-
-        // tmp_user_data.nickname = $('#ta-nickname').val().replace(/(\r\n|\n|\r)/gm, " ");
-        // tmp_user_data.bio = $('#ta-bio').val().replace(/(\r\n|\n|\r)/gm, "");
-        
-        // //dataKeys.data(JSON.stringify(tmp_user_data));
-
-        // tmp_user_data.id = 'Anon' + Math.random() * 1000;
-        // tmp_user_data.emoji = document.getElementById('profile-avatar').innerHTML;
-        // tmp_user_data.uid = create_UUID();
-        // tmp_user_data.nickname = document.getElementById('ta-nickname').innerHTML;
-        // tmp_user_data.bio = document.getElementById('ta-bio').innerHTML;
-        // tmp_user_data.attachment = '';
-        // tmp_user_data.points = 0;
-        // tmp_user_data.games = {};
-
-        // //console.log(tmp_user_data)
-        // //dataKeys.data(JSON.stringify(tmp_user_data));
-        // document.getElementById("profile-c").style.display = "none";
-        // //document.getElementById("profile-b").style.display = "block";
 
         try {
 
@@ -1007,10 +1063,6 @@ function userConfig() {
             const wiimote = new WIIMote(device)
             wiimotes.push(wiimote);
 
-
-            //players_data.push(tmp_user_data);
-            //console.log(wiimotes[wiimotes.length-1].data);
-
             document.getElementById("request-hid-device").innerText = "+ "+(wiimotes.length+1);
 
 
@@ -1020,10 +1072,9 @@ function userConfig() {
 
             addStaticBall()
 
-             document.getElementById("profile-c").style.display = "none";
+            document.getElementById("profile-c").style.display = "none";
 
-
-            if(wiimotes.length >= 4) {
+            if(wiimotes.length >= max_wiimotes) {
              document.getElementById("request-hid-device").style.display = "none";  
             }
 
@@ -1050,16 +1101,18 @@ function userConfig() {
 
     }
 
-    //document.getElementById("profile-c").style.display = "none";
 
     $('#profile-avatar').on('click', function (e) {
 
       e.preventDefault();
 
       var new_emoji = emojis.rand.give();
+      var num = wiimotes.length+1;
+      var nickname = 'Anon';
       
       document.getElementById('profile-avatar').innerHTML = new_emoji.emoji;
       document.getElementById('ta-bio').innerHTML = new_emoji.name;
+      document.getElementById('ta-nickname').innerHTML = nickname+''+num;
 
       //tmp_user_data.nickname = $('#ta-nickname').val();
       //dataKeys.data(JSON.stringify(tmp_user_data));
@@ -1074,7 +1127,16 @@ function userConfig() {
 }
 w.userConfig = userConfig;
 
-    
+   
+function mashAvatars() {
+      let new_emoji = emojis.rand.give();
+      let num = wiimotes.length+1;
+      let nickname = 'Anon';
+      document.getElementById('profile-avatar').innerHTML = new_emoji.emoji;
+      document.getElementById('ta-bio').innerHTML = new_emoji.name;
+      document.getElementById('ta-nickname').innerHTML = nickname+''+num;
+}
+
 
 
 function initController() {
@@ -1095,122 +1157,15 @@ function initController() {
 
          document.getElementById("profile-c").style.display = "block";
 
+         mashAvatars()
+
+
+         if(wiimotes.length > 0) {
+            document.getElementById("game-start-b").style.display = "inline-block";
+         }
+
+
     }
-
-     // Note this is a function
-    //     // controller.newDevice(pop, _connected)
-
-    //     try {
-
-    //         const devices = await navigator.hid.requestDevice({
-    //             filters: [{ vendorId: 0x057e }],
-    //         });
-
-    //         device = devices[0];
-            
-    //         const wiimote = new WIIMote(device)
-
-    //         wiimotes.push(wiimote);
-
-    //         conBut.innerText = "+ "+(wiimotes.length+1);
-
-    //         addHUD(wiimotes.length-1)
-
-    //         addBrushes(wiimotes.length-1)
-
-
-    //         addStaticBall()
-
-
-    //         if(wiimotes.length >= 4) {
-    //          document.getElementById("request-hid-device").style.display = "none";  
-    //         }
-
-    //         loadingEl.style.display = "none";
-
-    //     } catch (error) {
-    //         console.log("An error occurred.", error);
-
-    //     }
-
-    //     if (!device) {
-    //         console.log("No device was selected.");
-
-    //     } else {
-
-    //         console.log(`HID: ${device.productName}`);
-
-    //             setTimeout(() => {
-
-    //             enableControls()
-    //         }, 200);
-
-    //     }
-    // }
-
-    // buttonsW.appendChild(conBut)
-
-
-    /*    window.navigator.hid.addEventListener('connect', ({device}) => {
-          console.log(`HID connected: ${device.productName}`);
-        });   
-
-
-        window.navigator.hid.addEventListener('disconnect', ({device}) => {
-          console.log(`HID disconnected: ${device.productName}`);
-        });     
-
-
-        device.addEventListener("inputreport", event => {
-          const { data, device, reportId } = event;
-
-          // Handle only the Joy-Con Right device and a specific report ID.
-          if (device.productId !== 0x2007 && reportId !== 0x3f) return;
-
-          const value = data.getUint8(0);
-          if (value === 0) return;
-
-          const someButtons = { 1: "A", 2: "X", 4: "B", 8: "Y" };
-          console.log(`User pressed button ${someButtons[value]}.`);
-        });*/
-
-
-    // let virtControl = document.createElement("button");
-
-    //     virtControl.className = "bu";
-    //     virtControl.innerText = "+ V";
-
-    //     virtControl.onclick = function() { // Note this is a function
-    //         console.log("Virtual controller connected")
-
-    //         setTimeout(() => {
-    //             mC.removeChild(tempGUI);
-    //             mC.removeChild(tempLOGO)
-    //         }, 2000);
-    //     }
-
-    // buttonsW.appendChild(virtControl)
-
-
-    // var clearBtn = document.createElement("button");
-
-    //     clearBtn.innerText = "CLEAR PAINTING";
-    //     clearBtn.className = "bu";
-
-    //     clearBtn.onclick = function() { // Note this is a function
-    //         canvasItems.forEach(item => {
-    //             item.destroy()
-    //         });
-    //         canvasItems = []
-    //         // mC.destroy()
-    //         // app.stage.destroy(true)
-    //         // document.getElementsByTagName("canvas")[0].remove()
-    //         // // mC = new Container();
-    //         // initPixi()
-    //         // app.stage.addChild(mC);
-    //     };
-
-    // buttonsW.appendChild(clearBtn)
 
 }
 
@@ -1432,7 +1387,7 @@ function addHUD(id) {
         let d = wiimotes[id].data;
         let user = d.emoji +" "+d.nickname;
 
-        let r = new PIXI.Text(""+user+" JOIN!", {fontSize: fontSize, fontFamily: "DIN Condensed", align: "right", fill:color});
+        let r = new PIXI.Text(""+user+"", {fontSize: fontSize, fontFamily: "DIN Condensed", align: "right", fill:color});
         let nx = wapp.W/2 - r.width/2;
         let ny = 150+id*(fontSize+fY)
         r.position.x = nx;
@@ -1986,19 +1941,19 @@ function loadAssets() {
 function addUserPoints(owner) {
 
 
-    console.log("owner", owner)
+    //console.log("owner", owner)
 
     var id = parseFloat(String(owner).substr(5,3));
     
-    //let d = wiimotes[id].data;
+    let d = wiimotes[id].data;
 
-    console.log('id',id) 
+    //console.log('id',id) 
 
 
-    // let user = d.emoji +" "+d.nickname;
-    // let points = parseInt(d.points);
+    let user = d.emoji +" "+d.nickname;
+    let points = parseInt(d.points);
 
-    // app.stage.getChildByName("mC").getChildByName("vBrush"+id).children[1].text = ""+user+": +"+points;    
+    app.stage.getChildByName("mC").getChildByName("vBrush"+id).children[2].text = points;    
 
 }
 

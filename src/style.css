@@ -1,7 +1,7 @@
 body {
     border: 0;
     padding: 0;
-    font-family: "Avenir", "Arial", "Helvetica", "sans-serif";
+    font-family: "DIN Condensed", "Avenir", "Arial", "Helvetica", "sans-serif";
     font-size: 0.66rem;
     background-color: black;
     width: 100%;
@@ -24,8 +24,8 @@ button {
     text-transform: uppercase;
     text-decoration: none;
     background: #ff000000;
-    padding: 1rem;
-    margin: 0.1rem;
+    padding: 0.1rem;
+    margin: 1.1rem;
     border-radius: 9px;
     border-color: rgba(255, 255, 255, 1);
     display: inline-block;
@@ -60,6 +60,7 @@ button {
 
 
 .bu {
+    font-family: "DIN Condensed", "Avenir", "Arial", "Helvetica", "sans-serif";
     font-size: 2rem;
     color: #fff !important;
     text-transform: uppercase;
@@ -182,23 +183,6 @@ canvas {
     
 }
 
-#game {
-    position: absolute;
-    color: white;
-    background: rgba(0, 0, 0, 0.25);
-    padding: 0;
-    margin: 0;
-    align-content: center;
-    bottom: 0;
-    width: 100%;
-    text-align: center;
-}
-
-#game-msg {
-
-}
-
-
 
 
 form {
@@ -274,7 +258,7 @@ textarea:focus {
   width: -webkit-fill-available;
   padding: 1rem;
   font-size: 1.15rem;
-  font-family: Avenir, Roboto, Helvetica, Arial;
+  font-family: "DIN Condensed", Avenir, Roboto, Helvetica, Arial;
   border-radius: 0.5rem;
   margin-left: 2px;
   border-bottom-left-radius: 0px;
@@ -503,6 +487,7 @@ div button {
   /* border: 1px solid rgba(0,0,0,0.15); */
   font-size: 2.7rem !important;
   font-family: -apple-system;
+  margin: 0.25rem;
 
   -webkit-touch-callout: none;
   /* iOS Safari */
@@ -605,7 +590,7 @@ div button {
   width: auto;
   padding: 1rem;
   font-size: 1.1rem;
-  font-family: Avenir, Helvetica, Arial, Roboto;
+  font-family: "DIN Condensed", Avenir, Helvetica, Arial, Roboto;
   border-radius: 0.5rem;
   margin: 5px;
   margin-left: 15px;
@@ -682,7 +667,7 @@ div button {
 }
 
 #profile-save-b {
-  font-family: Avenir, Roboto, Helvetica, Arial;
+  font-family: "DIN Condensed", Avenir, Roboto, Helvetica, Arial;
   font-size: 1.3rem! important;
   padding: 0.7rem;
   border: none;
@@ -690,9 +675,26 @@ div button {
   color: white;
   background-color: black;
   -webkit-border-radius: 30px;
-  margin: 0 auto;
-  width: 111px;   
+  width: 111px;
+  display: inline-block;   
   
+}
+
+
+#game-start-b {
+  font-size: 1rem;
+  margin-top: 2rem;
+  display: none;
+/*  font-family: Avenir, Roboto, Helvetica, Arial;
+  font-size: 1.3rem! important;
+  padding: 0.7rem;
+  border: none;
+  cursor: pointer;
+  color: white;
+  background-color: black;
+  -webkit-border-radius: 30px;
+  width: 111px;
+  display: none;  */  
 }
 
 #profile-cancel-b {
