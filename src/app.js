@@ -412,16 +412,37 @@ w.barticles = barticles;
 
 var goalPosts = [];
 
-function addGoalPost() {
+
+function reposGoalPosts() {
+    let fl = wapp.W;
+    let arr = [fl*0.2,fl*0.8,fl*0.4,fl*0.6]
+    for (let a in balls) {
+        let b = balls[a]
+        if(String(b.name).includes("post")) {
+            //console.log(b.name)
+            let id = parseInt(String(b.name).substr(4,1));
+            b.x = arr[id-1]
+            b.y = 150; 
+        }
+    }
+}
+w.reposGoalPosts = reposGoalPosts;
+
+
+function addGoalPost(id) {
+
+    console.log("addGoalPost",id)
 
     let pad = 15;
     let offset = 150;
 
+    let color = globColors[id]
+
     // Circle + line style 1
     const c = new PIXI.Graphics();
 
-    c.lineStyle(2, 0xFEEB77, 1);
-    c.beginFill(0x650A5A, 0.1);
+    c.lineStyle(4, color, 0.95);
+    c.beginFill(0x000000, 0.05);
     c.drawCircle(0, 0, 66);
     c.endFill();
 
@@ -429,28 +450,31 @@ function addGoalPost() {
     const spr = PIXI.Sprite.from(tx);
 
     spr.name = "goalPost"+goalPosts.length;
-
     spr.anchor.set(0.55)
 
     goalPosts.push(spr)
 
 
-    if(goalPosts.length == 1) {
-        spr.x = offset;
-        spr.y = offset;
-    }
-    if(goalPosts.length == 2) {
-        spr.x = wapp.W - pad - spr.width;
-        spr.y = offset;
-    }
-    if(goalPosts.length == 3) {
-        spr.x = 350;
-        spr.y = offset;
-    }
-    if(goalPosts.length == 4) {
-        spr.x = wapp.W - pad - spr.width - 200;
-        spr.y = offset;
-    }        
+
+    // var fl = wapp.W;
+
+    // if(goalPosts.length == 1) {
+    //     spr.x = fl*0.2;
+    //     spr.y = offset;
+    // }
+    // if(goalPosts.length == 2) {
+    //     spr.x = fl*0.8
+    //     spr.y = offset;
+    // }
+    // if(goalPosts.length == 3) {
+    //     spr.x = fl*0.4
+    //     spr.y = offset;
+    // }
+    // if(goalPosts.length == 4) {
+    //     spr.x = fl*0.6;
+    //     spr.y = offset;
+    // }
+
 
 /*    if(goalPosts.length == 3) {
         spr.x = 150;
@@ -464,7 +488,6 @@ function addGoalPost() {
     console.log("goalPosts.length",goalPosts.length)
     
     balls[balls.length] = new Ball(
-
       spr.x,
       spr.y,
       spr.width,
@@ -473,12 +496,13 @@ function addGoalPost() {
       spr.width,
       spr.height,
       "post"+goalPosts.length
-
     );  
 
-
     mC.addChild(spr);
-    barticles.push(spr)  
+    barticles.push(spr) 
+
+
+    reposGoalPosts()     
 
 
 
@@ -494,6 +518,8 @@ function resetBalls() {
         if(String(r.name).includes("ball")) {
             r.x = wapp.W*0.33 + (Math.random()*wapp.W)*0.33;
             r.y = 0.65*(Math.random()*wapp.H) + wapp.H*0.35;
+            r.hit = 0;
+            r.owner = ''            
         }
     } 
 }
@@ -522,7 +548,7 @@ function addStaticBall() {
     //let tx = textures[Math.floor(Math.random() * textures.length)]
     const p = new PIXI.Sprite.from("./assets/Samsung_Internet_logo.png");
     
-    let s1 = 0.22;//Math.random()*0.1+ 0.01;
+    let s1 = 0.18;//Math.random()*0.1+ 0.01;
     
     p.scale.set(s1,s1);
     
@@ -565,7 +591,7 @@ function addBalls() {
         balls[i] = new Ball(
           Math.random()*$(window).width(),
           Math.random()*$(window).height(),
-          (Math.random() * 70) + 5,
+          (Math.random() * 55) + 10,
           i,
           balls,
           width,
@@ -905,7 +931,11 @@ var countdown = {
         let str = new Date(r.left * 1000).toISOString().substr(11, 8)
         let g = app.stage.getChildByName("mC").getChildByName("Countdown")
         g.text = str;
-        g.alpha = 0.05;    
+        g.alpha = 0.05;
+        let mx = wapp.W/2 - g.width/2;
+        let my  = wapp.H/2 - g.height/2;
+        g.x = mx;
+        g.y = my;            
 
         if(r.left <= 0) {
             let f = app.stage.getChildByName("mC").getChildByName("Countdown");
@@ -917,8 +947,8 @@ var countdown = {
             sound.play('gameover');
             r.stop();
 
-
-            setTimeout(startAgain, 5000)
+            //setTimeout(startAgain, 15000)
+            setTimeout(showWinner, 3000);
 
         }
         //console.log('tick', r.left);
@@ -1019,11 +1049,15 @@ function startAgain() {
 
         console.log("start game");
 
+        if(app.stage.getChildByName("mC").getChildByName("winnerList")) {
+            app.stage.getChildByName("mC").getChildByName("winnerList").visible = false;
+        }
+
         max_wiimotes = wiimotes.length;
 
         countdown.create('00:00:00', app.stage.getChildByName("mC"))
 
-        countdown.start(10)
+        countdown.start(60)
 
         document.getElementById("buttons").style.display = "none";
 }
@@ -1067,7 +1101,9 @@ function userConfig() {
 
 
             setTmpUserData(wiimotes.length-1)
+
             addHUD(wiimotes.length-1)
+            
             addBrushes(wiimotes.length-1)
 
             addStaticBall()
@@ -1292,33 +1328,29 @@ function addBrushes(id) {
 
     let n = id+1;
 
-    // brush with a number
+    let col = globColors[id]
 
     // add container + text
     let d = wiimotes[id].data;
-    let user = d.emoji +" "+d.nickname;
-    const textUsername = new PIXI.Text(""+user+"", {fontSize: 38, fontFamily: "DIN Condensed", align: "right", fill:"white"});
-    textUsername.x = 60;
+    //let user = d.emoji +" "+d.nickname;
+    let user = d.emoji;
+
+    const textUsername = new PIXI.Text(""+user+"", {fontSize: 88, fontFamily: "DIN Condensed", align: "right", fill:col});
+    textUsername.x = 0;
     textUsername.y = -10;
     textUsername.name = "user"+id;
 
-
-    const textPoints = new PIXI.Text(""+d.points+"", {fontSize: 56, fontFamily: "DIN Condensed", align: "left", fill:"yellow"});
-    textPoints.x = 60;
-    textPoints.y = 30;
+    const textPoints = new PIXI.Text(""+d.points+"", {fontSize: 32, fontFamily: "DIN Condensed", align: "left", fill:col});
+    textPoints.x = 90;
+    textPoints.y = 60;
     textPoints.name = "points"+id;
-
-
-    // let nx = wapp.W/2 - r.width/2;
-    // let ny = 150+id*(fontSize+fY)
-    // r.position.x = nx;
-
 
     const r = new PIXI.Container();
 
     const im = new PIXI.Sprite.from("./assets/brushes/vBrush-"+n+".png"); //Sprite.from(textures[5])
     r.zIndex = 1000000+id;
     r.name = "vBrush"+id;
+    im.alpha = 0;
 
     r.addChild(im);
     r.addChild(textUsername);
@@ -1369,18 +1401,68 @@ function fadein(r) {
 w.fadein = fadein;
 
 
+let globColors = [0xFF0000,0x00FF00,0x0000FF,0xFF00FF,0xFFFF00,0x00FFFF]
+
+
+function showWinner() {
+
+    let f = app.stage.getChildByName("mC").getChildByName("Countdown");
+    f.text = "";
+
+    //winners container
+    if(!app.stage.getChildByName("mC").getChildByName("winnerList")) {
+        const rc = new PIXI.Container();
+        rc.name = "winnerList"
+        mC.addChild(rc);
+    } else {
+        app.stage.getChildByName("mC").getChildByName("winnerList").visible = true;
+    }
+
+    //winners list
+    let fontSize = 68; 
+    let fY = fontSize*0.2;
+    players_data.sort((a, b) => b.points - a.points)
+
+    for(let i=0; i<wiimotes.length; i++) {
+        console.log(i);
+        let color = globColors[i]
+        let txt = players_data[i].emoji +" "+players_data[i].points;
+
+        if(!app.stage.getChildByName("mC").getChildByName("result"+i)) {
+            let f = new PIXI.Text(""+txt+"", {fontSize: fontSize, fontFamily: "DIN Condensed", align: "right", fill:color});
+            let nx = wapp.W/2 - f.width/2;
+            let ny = 150+i*(fontSize+fY);
+            f.x = nx;  
+            f.y = ny;
+            f.name = "result"+i;
+            f.alpha = 1;
+            app.stage.getChildByName("mC").getChildByName("winnerList").addChild(f)
+        } else {
+          let rf = app.stage.getChildByName("mC").getChildByName("result"+i)  
+          rf.text = txt;
+        }
+    }
+
+    setTimeout(startAgain, 15000)
+
+
+
+}
+w.showWinner = showWinner;
+
+
 
 
 function addHUD(id) {
 
         console.log("addHUD",id)
 
-        let colors = ["yellow","red","green","blue"]
-        let color = colors[id];
+        
+        let color = globColors[id];
 
         // EXTRA LIFES
         //----------------
-        let fontSize = 88; 
+        let fontSize = 68; 
         let fY = fontSize*0.2;
         let n = parseInt(id)+1;
 
@@ -1392,6 +1474,7 @@ function addHUD(id) {
         let ny = 150+id*(fontSize+fY)
         r.position.x = nx;
         //r.position.y = 150+id*(fontSize+fY);
+
         r.name = "R"+id
 
         mC.addChild(r);    
@@ -1404,7 +1487,7 @@ function addHUD(id) {
 
         sound.play('joined');
 
-        addGoalPost()
+        addGoalPost(id)
 
 
     // body...
@@ -1650,79 +1733,66 @@ function initPixi() {
     // }
 
 
-    function changeTool(tool) {
-        console.log("changeTool(tool)", tool)
-        selectedTool = tool
-    }
-
-    w.changeTool = changeTool;
+    selectedTool = "paint"
 
 
-    function _toolSelect(tool, x, y) {
+    // function _toolSelect(tool, x, y) {
 
-        console.log("_toolSelect(tool, x, y)", tool, x, y)
+    //     console.log("_toolSelect(tool, x, y)", tool, x, y)
 
-        if (selectedTool != null) {
-            mC.removeChild(selectedToolGraphic)
-        }
+    //     if (selectedTool != null) {
+    //         mC.removeChild(selectedToolGraphic)
+    //     }
 
-        selectedToolGraphic = new PIXI.Graphics();
-        selectedToolGraphic.beginFill(0xffffff, 0.4);
-        selectedToolGraphic.drawRect(x, y, 80, 80);
-        selectedToolGraphic.endFill();
-        selectedToolGraphic.zIndex = 10
-        selectedTool = tool;
+    //     selectedToolGraphic = new PIXI.Graphics();
+    //     selectedToolGraphic.beginFill(0xffffff, 0.4);
+    //     selectedToolGraphic.drawRect(x, y, 80, 80);
+    //     selectedToolGraphic.endFill();
+    //     selectedToolGraphic.zIndex = 10
+    //     selectedTool = tool;
 
-        mC.addChild(selectedToolGraphic)
-    }
-
-
-    function loadTextures() {
-
-        const bottomBackgroundTool = new PIXI.Graphics();
-        bottomBackgroundTool.beginFill(cols_grey);
-        bottomBackgroundTool.drawRect(0, wapp.H - 80, wapp.W, 100);
-        bottomBackgroundTool.endFill();
-        bottomBackgroundTool.zIndex = 10
-        //mC.addChild(bottomBackgroundTool)
-
-        const list = [0, 1, 3, 5, 7, 8, 11, 14, 15]
-
-        // list.forEach((item, index) => {
+    //     mC.addChild(selectedToolGraphic)
+    // }
 
 
-        //     const x = 50+(index * 110)
-        //     const y = 560
+    // function loadTextures() {
 
-        //     const svgItem = pop(item, x, y)
+    //     const bottomBackgroundTool = new PIXI.Graphics();
+    //     bottomBackgroundTool.beginFill(cols_grey);
+    //     bottomBackgroundTool.drawRect(0, wapp.H - 80, wapp.W, 100);
+    //     bottomBackgroundTool.endFill();
+    //     bottomBackgroundTool.zIndex = 10
+    //     //mC.addChild(bottomBackgroundTool)
 
-        //     svgItem.scale.set(0.6, 0.6)
-        //     svgItem.interactive = true
-        //     svgItem.zIndex = 11
+    //     const list = [0, 1, 3, 5, 7, 8, 11, 14, 15]
 
-
-        //     // svgItem.on('pointertap', () => {
-        //     //     // alert(textureId, x, y)
-        //     //     _selected(item, x, y)
-        //     // });
+    //     // list.forEach((item, index) => {
 
 
-        // });
-    }
+    //     //     const x = 50+(index * 110)
+    //     //     const y = 560
+
+    //     //     const svgItem = pop(item, x, y)
+
+    //     //     svgItem.scale.set(0.6, 0.6)
+    //     //     svgItem.interactive = true
+    //     //     svgItem.zIndex = 11
 
 
+    //     //     // svgItem.on('pointertap', () => {
+    //     //     //     // alert(textureId, x, y)
+    //     //     //     _selected(item, x, y)
+    //     //     // });
 
-    loadTextures()
+
+    //     // });
+    // }
+
+    // loadTextures()
 
     window.pop = pop
 
-
-    changeTool("paint");
-
-
-
-
-
+    //changeTool("paint");
 
 
     app.ticker.add((delta) => {
@@ -1823,31 +1893,19 @@ function initPixi() {
 
         }
 
-
-
-        /* P5 balls */
-
-    if (balls.length > 0) {
-
-        balls.forEach(ball => {
-             ball.collide();
-             ball.move();
-             ball.display();
-
-        });
-
-    } else {
-        addBalls();
-        
-        //addStaticBall();
-
-    }
-
-
-
-
-
-
+        /* Balls
+            -----------------------------
+                                        */
+        if (balls.length > 0) {
+            balls.forEach(ball => {
+                 ball.collide();
+                 ball.move();
+                 ball.display();
+            });
+        } else {
+            addBalls();
+            //addStaticBall();
+        }
 
     })
 
@@ -1864,6 +1922,9 @@ w.initController = initController;
 
 function resizeGame() {
     //console.log("resizeGame: >", $(window).width())
+
+    reposGoalPosts()
+
     wapp.W = $(window).width();
     wapp.H = $(window).height();
     document.getElementById("IRdebug").innerHTML = wapp.W + " x " + wapp.H;
@@ -1969,8 +2030,7 @@ function addPoints(id,p) {
     //ptxt.text = ""+n+": "+wiimotes[id].points+"";
     ptxt.text = ""+wiimotes[id].data.points+"";
     ptxt.alpha = 1;
-    //bounce(sBrushes[id])
-    //bounce(ptxt)
+
     fadein(ptxt)
 
     sound.play('boing');
@@ -2003,48 +2063,10 @@ function setupStage() {
     mC.buttonMode = true
     mC.sortableChildren = true
 
-    paintingArea = new PIXI.Graphics();
-
-    paintingArea.beginFill(cols_blue1);
-    paintingArea.drawRect(0, 0, wapp.W, wapp.H);
-    paintingArea.endFill();
-    paintingArea.zIndex = 1
-    paintingArea.interactive = true
-
-
-
-    paintingArea.on('pointertap', (pointer) => {
-
-
-        console.log('pointertap', pointer.data.global)
-
-        const { x, y, id } = vBrushes[currentID] //pointer.data.global
-
-
-
-        if (selectedTool == "paint") { //  && x > 80+50
-            let svgItem = pop(selectedGraphic, x, y, id)
-            canvasItems.push(svgItem)
-        }
-
-        //console.log("paintingArea.on('pointertap', (pointer), selectedTool", pointer, selectedTool, currentID)
-
-
-    });
-
-    //mC.addChild(paintingArea)
-
-
-
     initPixi();
 
     userConfig();
-
-
 }
-
-
-
 
 
 /*
@@ -2057,20 +2079,15 @@ function setupStage() {
 let mouse;
 //window.mouse = mouse
 
-
 function captureMouse(event) {
-
   let mouse = {x: 0, y: 0, event: null},
       body_scrollLeft = document.body.scrollLeft,
       element_scrollLeft = document.documentElement.scrollLeft,
       body_scrollTop = document.body.scrollTop,
       element_scrollTop = document.documentElement.scrollTop
-
       // offsetLeft = element.offsetLeft,
       // offsetTop = element.offsetTop;
-    
     let x, y;
-
     if (event.pageX || event.pageY) {
       x = event.pageX;
       y = event.pageY;
@@ -2078,32 +2095,21 @@ function captureMouse(event) {
       x = event.clientX + body_scrollLeft + element_scrollLeft;
       y = event.clientY + body_scrollTop + element_scrollTop;
     }
-
     // x -= offsetLeft;
     // y -= offsetTop;
-    
     mouse.x = x;
     mouse.y = y;
     mouse.event = event;
-
     window.mouse = mouse;
-
     //console.log(window.mouse)
-
     //return mouse;
-
-
-
-
 }
 
 
 function loadConfig(callback) {
-
     var xobj = new XMLHttpRequest();
     xobj.overrideMimeType("application/json");
     xobj.open('GET', contentData, true);
-
     xobj.onreadystatechange = function() {
         //console.log('xobj.readyState',xobj.readyState)
         if (xobj.readyState == 4 && xobj.status == "200") {
@@ -2114,13 +2120,10 @@ function loadConfig(callback) {
 }
 
 
-
 //read setup
 function initConfig() {
-
     loadingEl = document.getElementById('loading')
     loadingElMsg = document.getElementById('loading-msg')
-
     loadConfig(function(response) {
         // Parse JSON string into object
         wapp.data = JSON.parse(response);
@@ -2130,13 +2133,6 @@ function initConfig() {
 
 initConfig();
 
-
-
-
-
 window.addEventListener('resize', resizeGame, false);
 window.addEventListener('mousemove', captureMouse, false);
-
-
-
 
