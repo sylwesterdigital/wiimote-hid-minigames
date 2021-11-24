@@ -1,10 +1,11 @@
-# wiimote-hid-minigames for Samsung SRUK
-Minigames for Wiimote Web HID API
+## wiimote-hid-minigames for Samsung SRUK
+#Minigames for Wiimote Web HID API
 
 # demo link
 ```
-https://xr.workwork.fun/samsung/wall/...
+https://xr.workwork.fun/samsung/wall/minigame4/
 ```
+
 # get repository
 ```
 $ git clone git@github.com:sylwesterdigital/wiimote-hid-minigames.git
