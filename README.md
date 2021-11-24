@@ -1,5 +1,8 @@
 ## wiimote-hid-minigames for Samsung SRUK
-### Minigames for Wiimote Web HID API
+### Minigames for Browser + Nintendo Wiimotes - example of Multiplayer WebHID API
+
+![Screenshot 2021-11-24 at 19 56 57](https://user-images.githubusercontent.com/27820237/143315941-4b22beeb-917a-43e5-ac40-f1825ea99a1d.png)
+
 
 ## demo link
 ```
