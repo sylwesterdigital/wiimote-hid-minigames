@@ -25,7 +25,7 @@ $ build
 npm run build
 
 ### Credits - Wiimote-webhid
-##Kevin Picchi
+## Kevin Picchi
 ```
 $git clone  git@github.com:PicchiKevin/wiimote-webhid.git
 ```
