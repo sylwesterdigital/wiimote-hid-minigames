@@ -73,10 +73,10 @@ let mC
 let canvasItems = []
 let paintingArea
 
-let vBrush1, vBrush2, vBrush3, vBrush4;
+let vBrush1, vBrush2, vBrush3, vBrush4, vBrush5;
 let vBrushes = []
 
-let sBrush1, sBrush2, sBrush3, sBrush4;
+let sBrush1, sBrush2, sBrush3, sBrush4, sBrush5;
 let sBrushes = []
 
 
@@ -223,6 +223,10 @@ class Ball {
 
                     if(this.others[i].name == "post4") {
                         addPoints(3,-10)
+                    }   
+
+                    if(this.others[i].name == "post5") {
+                        addPoints(4,-10)
                     }   
 
                     sound.play('hit1');
@@ -414,12 +418,13 @@ var goalPosts = [];
 
 
 function reposGoalPosts() {
+
     let fl = wapp.W;
-    let arr = [fl*0.2,fl*0.8,fl*0.4,fl*0.6]
+    let arr = [fl*0.17,fl*0.34,fl*0.50,fl*0.64,fl*0.81]
+
     for (let a in balls) {
         let b = balls[a]
         if(String(b.name).includes("post")) {
-            //console.log(b.name)
             let id = parseInt(String(b.name).substr(4,1));
             b.x = arr[id-1]
             b.y = 150; 
@@ -431,7 +436,7 @@ w.reposGoalPosts = reposGoalPosts;
 
 function addGoalPost(id) {
 
-    console.log("addGoalPost",id)
+    console.log("addGoalPost", id)
 
     let pad = 15;
     let offset = 150;
@@ -443,7 +448,7 @@ function addGoalPost(id) {
 
     c.lineStyle(4, color, 0.95);
     c.beginFill(0x000000, 0.05);
-    c.drawCircle(0, 0, 66);
+    c.drawCircle(0, 0, 45);
     c.endFill();
 
     const tx = app.renderer.generateTexture(c);
@@ -454,36 +459,6 @@ function addGoalPost(id) {
 
     goalPosts.push(spr)
 
-
-
-    // var fl = wapp.W;
-
-    // if(goalPosts.length == 1) {
-    //     spr.x = fl*0.2;
-    //     spr.y = offset;
-    // }
-    // if(goalPosts.length == 2) {
-    //     spr.x = fl*0.8
-    //     spr.y = offset;
-    // }
-    // if(goalPosts.length == 3) {
-    //     spr.x = fl*0.4
-    //     spr.y = offset;
-    // }
-    // if(goalPosts.length == 4) {
-    //     spr.x = fl*0.6;
-    //     spr.y = offset;
-    // }
-
-
-/*    if(goalPosts.length == 3) {
-        spr.x = 150;
-        spr.y = wapp.H - 250;
-    }
-    if(goalPosts.length == 4) {
-        spr.x = wapp.W - pad - spr.width;
-        spr.y = wapp.H - 250;
-    }*/
 
     console.log("goalPosts.length",goalPosts.length)
     
@@ -642,9 +617,8 @@ function circleLed() {
         }
     }, 500)
 }
-
-
 let currentID
+
 
 function enableControls() {
 
@@ -654,10 +628,18 @@ function enableControls() {
     // circleLed()
 
     let wiiN = wiimotes.length-1;
+    let toggle = wiiN;
 
     wiimotes[wiiN].initiateIR()
 
     wiimotes[wiiN].toggleLed(wiiN)
+
+    if(wiiN > 4) {
+        wiimotes[wiiN].toggleLed(0)
+        wiimotes[wiiN].toggleLed(1)
+        wiimotes[wiiN].toggleLed(2)
+        wiimotes[wiiN].toggleLed(3)
+    }
 
     // wiimotes[wiiN].BtnListener = function(buttons) {
 
@@ -1064,17 +1046,15 @@ function startAgain() {
 
 
 
-let max_wiimotes = 4;
+let max_wiimotes = 5;
 
 function userConfig() {
 
-
     console.log("userConfig");
 
-    document.getElementById("game-start-b").innerHTML = "START"
+    document.getElementById("game-start-b").innerHTML = "START";
 
-
-     document.getElementById("game-start-b").onclick = function() {
+    document.getElementById("game-start-b").onclick = function() {
 
         startAgain();
 
@@ -1098,7 +1078,6 @@ function userConfig() {
             wiimotes.push(wiimote);
 
             document.getElementById("request-hid-device").innerText = "+ "+(wiimotes.length+1);
-
 
             setTmpUserData(wiimotes.length-1)
 
@@ -1274,11 +1253,6 @@ function clearAllCanvas() {
 // }
 
 
-function startGame(argument) {
-    // body...
-}
-
-
 
 let particles = []
 w.particles = particles;
@@ -1401,7 +1375,7 @@ function fadein(r) {
 w.fadein = fadein;
 
 
-let globColors = [0xFF0000,0x00FF00,0x0000FF,0xFF00FF,0xFFFF00,0x00FFFF]
+let globColors = [0xFF0000,0x00FF00,0x0000FF,0xFF00FF,0xFFFF00,0x00FFFF,0xF0F0F0]
 
 
 function showWinner() {
@@ -1412,7 +1386,7 @@ function showWinner() {
     //winners container
     if(!app.stage.getChildByName("mC").getChildByName("winnerList")) {
         const rc = new PIXI.Container();
-        rc.name = "winnerList"
+        rc.name = "winnerList";
         mC.addChild(rc);
     } else {
         app.stage.getChildByName("mC").getChildByName("winnerList").visible = true;
@@ -1421,17 +1395,37 @@ function showWinner() {
     //winners list
     let fontSize = 68; 
     let fY = fontSize*0.2;
+    let add = '';
+
     players_data.sort((a, b) => b.points - a.points)
 
     for(let i=0; i<wiimotes.length; i++) {
         console.log(i);
         let color = globColors[i]
-        let txt = players_data[i].emoji +" "+players_data[i].points;
+
+        if(i == 0) {
+            add = '🏆'
+        }
+        if(i == 1) {
+            add = '🥈'
+        }
+        if(i == 2) {
+            add = '🥉'
+        }
+        if(i == 3) {
+            add = '😞'
+        }
+        if(i == 4) {
+            add = ''
+        }
+
+
+        let txt = add +' ' +players_data[i].emoji +" "+players_data[i].points +' '+add;
 
         if(!app.stage.getChildByName("mC").getChildByName("result"+i)) {
             let f = new PIXI.Text(""+txt+"", {fontSize: fontSize, fontFamily: "DIN Condensed", align: "right", fill:color});
             let nx = wapp.W/2 - f.width/2;
-            let ny = 150+i*(fontSize+fY);
+            let ny = 180+i*(fontSize+fY);
             f.x = nx;  
             f.y = ny;
             f.name = "result"+i;
@@ -1456,8 +1450,7 @@ w.showWinner = showWinner;
 function addHUD(id) {
 
         console.log("addHUD",id)
-
-        
+      
         let color = globColors[id];
 
         // EXTRA LIFES
@@ -1505,54 +1498,29 @@ function initPixi() {
     //let view = document.getElementById("screen")
 
     app = new PIXI.Application({
-        /*        width: wapp.W, 
-                height: wapp.H, */
         backgroundColor: cols_blue1,
         resizeTo: window
     });
 
     app.playing = false;
 
-
-    // app.renderer.plugins.interaction.cursorStyles.default = "url('./src/assets/cursor/1/cursor_96.png'), auto";
-    // app.renderer.plugins.interaction.cursorStyles.hover = "url('./src/assets/cursor/1/cursor_96.png'), auto";
-    // app.renderer.plugins.interaction.cursorStyles.pointer = "url('./src/assets/cursor/1/cursor_96.png'), auto";
-
-
-
     window.app = app
 
-    //view.appendChild(app.view);
     document.body.appendChild(app.view);
 
     app.stage.addChild(mC);
 
-    // mC.addChild(vBrush1)
-    // mC.addChild(vBrush2)
-    // mC.addChild(vBrush3)
-    // mC.addChild(vBrush4)
-
-    // mC.addChild(sBrush1)
-    // mC.addChild(sBrush2)
-    // mC.addChild(sBrush3)
-    // mC.addChild(sBrush4)
-
-
     function dropPaint(id) {
-        // body...
+
         console.log("dropPaint",id)
 
         let x = sBrushes[id].x;
         let y = sBrushes[id].y;
 
-        //let tid = sBrushes[id].id;
 
         let textureId = sBrushes[id].tid;
 
         pop(textureId, x, y, id) 
-
-
-
 
 
     }
@@ -1565,46 +1533,26 @@ function initPixi() {
 
         var texture, svg;
 
-        // if (textureId == "random") {
+        texture = textures[textureId]
 
-        //     texture = textures[Math.floor(Math.random() * textures.length)]
-        //     svg = new PIXI.Sprite(texture);
-        //     svg.x = Math.floor(Math.random() * (app.screen.width - 150)) + 50
-        //     svg.y = Math.floor(Math.random() * (app.screen.height - 150)) + 50
+        svg = new PIXI.Sprite(texture);
+        svg.scale.set(scale1, scale1);
 
-        // } else {
+        svg.x = x
+        svg.y = y
 
+        svg.speedX = Math.random() * 3 - Math.random() * 3
+        svg.speedY = Math.random() * 3 - Math.random() * 3
 
-            texture = textures[textureId]
+        svg.angle = vBrushes[id].angle * 5;
 
-            svg = new PIXI.Sprite(texture);
-            svg.scale.set(scale1, scale1);
+        svg.scale.set(sBrushes[id].scale.x, sBrushes[id].scale.y);
 
-            svg.x = x
-            svg.y = y
-
-            svg.speedX = Math.random() * 3 - Math.random() * 3
-            svg.speedY = Math.random() * 3 - Math.random() * 3
-
-            svg.angle = vBrushes[id].angle * 5;
-
-            svg.scale.set(sBrushes[id].scale.x, sBrushes[id].scale.y);
-
-
-
-        // }
 
         svg.anchor.set(0.5);
         svg.zIndex = 1;
 
-        // svg.buttonMode = true;
-
         mC.addChild(svg);
-
-        //console.log("pop(textureId, x, y)", textureId, x, y, "textures.length", textures.length)
-
-        //console.log("pop");
-
 
         canvasItems.push(svg)
 
@@ -1614,15 +1562,11 @@ function initPixi() {
 
     function leftRightSelector(dir,id) {
 
-        // leftRightSelector
-
         if (dir < 1) {
             selectorKey -= selectorSpeed;
         } else {
             selectorKey += selectorSpeed;
         }
-
-
         let v = Math.floor(selectorKey);
 
 
@@ -1642,13 +1586,11 @@ function initPixi() {
         sBrushes[id].texture = textures[v]
         sBrushes[id].tid = v; 
 
-        //console.log("leftRightSelector(dir), selectedGraphic", dir, selectedGraphic)
         console.log(v)
 
     }
 
     w.leftRightSelector = leftRightSelector;
-
 
 
     function freeState(obj,arg) {
@@ -1659,6 +1601,8 @@ function initPixi() {
         }
     }
     w.freeState = freeState;
+
+
 
     function flipScale(d,id) {
         // console.log(d)
@@ -1678,121 +1622,22 @@ function initPixi() {
 
 
 
-
-
-
     function textureScale(dir,id) {
 
         console.log("textureScale, dir", dir)
 
-
         sBrushes[id].scale.x += dir * 0.001;
-
-
-        // if(sBrushes[0].scale.x < sBrushes[0].maxScale){
-        //     sBrushes[0].scale.x += 0.01
-        // } else {
-        //     sBrushes[0].scale.x = sBrushes[0].maxScale            
-        // }
-
-        // if(sBrushes[0].scale.x < sBrushes[0].minScale) {
-        //     sBrushes[0].scale.x = sBrushes[0].minScale;
-
-        // }
-
 
         sBrushes[id].scale.y = sBrushes[id].scale.x;
 
-
-        //sBrushes[0].scale.set(nscale)
-
     }
-
 
     w.textureScale = textureScale;
 
-
-
-
-    // function _selected(textureId, x, y) {
-
-    //     console.log("_selected: textureId, x, y", textureId, x, y)
-
-    //     if (selected != null) {
-    //         mC.removeChild(selected)
-    //     }
-
-    //     selected = new Graphics();
-    //     selected.beginFill(0xFFC0CB, 0.4);
-    //     selected.drawRect(x - 35, wapp.H - 80, 80, 80);
-    //     selected.endFill();
-    //     selected.zIndex = 10
-    //     selectedGraphic = textureId
-
-    //     mC.addChild(selected)
-    // }
-
-
     selectedTool = "paint"
-
-
-    // function _toolSelect(tool, x, y) {
-
-    //     console.log("_toolSelect(tool, x, y)", tool, x, y)
-
-    //     if (selectedTool != null) {
-    //         mC.removeChild(selectedToolGraphic)
-    //     }
-
-    //     selectedToolGraphic = new PIXI.Graphics();
-    //     selectedToolGraphic.beginFill(0xffffff, 0.4);
-    //     selectedToolGraphic.drawRect(x, y, 80, 80);
-    //     selectedToolGraphic.endFill();
-    //     selectedToolGraphic.zIndex = 10
-    //     selectedTool = tool;
-
-    //     mC.addChild(selectedToolGraphic)
-    // }
-
-
-    // function loadTextures() {
-
-    //     const bottomBackgroundTool = new PIXI.Graphics();
-    //     bottomBackgroundTool.beginFill(cols_grey);
-    //     bottomBackgroundTool.drawRect(0, wapp.H - 80, wapp.W, 100);
-    //     bottomBackgroundTool.endFill();
-    //     bottomBackgroundTool.zIndex = 10
-    //     //mC.addChild(bottomBackgroundTool)
-
-    //     const list = [0, 1, 3, 5, 7, 8, 11, 14, 15]
-
-    //     // list.forEach((item, index) => {
-
-
-    //     //     const x = 50+(index * 110)
-    //     //     const y = 560
-
-    //     //     const svgItem = pop(item, x, y)
-
-    //     //     svgItem.scale.set(0.6, 0.6)
-    //     //     svgItem.interactive = true
-    //     //     svgItem.zIndex = 11
-
-
-    //     //     // svgItem.on('pointertap', () => {
-    //     //     //     // alert(textureId, x, y)
-    //     //     //     _selected(item, x, y)
-    //     //     // });
-
-
-    //     // });
-    // }
-
-    // loadTextures()
 
     window.pop = pop
 
-    //changeTool("paint");
 
 
     app.ticker.add((delta) => {
@@ -1935,6 +1780,7 @@ window.textures = textures;
 
 
 
+
 function addSprites(resources) {
     console.log("addSprites")
     Object.keys(resources).forEach(key => {
@@ -1946,6 +1792,7 @@ function addSprites(resources) {
     });
     setupStage()
 }
+
 
 
 
@@ -1998,6 +1845,9 @@ function loadAssets() {
 
 
 }
+
+
+
 
 function addUserPoints(owner) {
 
@@ -2053,6 +1903,8 @@ function addPoints(id,p) {
 }
 
 
+
+
 function setupStage() {
 
     console.log("setupStage");
@@ -2067,6 +1919,8 @@ function setupStage() {
 
     userConfig();
 }
+
+
 
 
 /*
@@ -2106,6 +1960,7 @@ function captureMouse(event) {
 }
 
 
+
 function loadConfig(callback) {
     var xobj = new XMLHttpRequest();
     xobj.overrideMimeType("application/json");
@@ -2120,7 +1975,7 @@ function loadConfig(callback) {
 }
 
 
-//read setup
+
 function initConfig() {
     loadingEl = document.getElementById('loading')
     loadingElMsg = document.getElementById('loading-msg')
@@ -2135,4 +1990,3 @@ initConfig();
 
 window.addEventListener('resize', resizeGame, false);
 window.addEventListener('mousemove', captureMouse, false);
-
